@@ -1,0 +1,1162 @@
+mutation RegisterUser(
+    $firstName: String!
+    $lastName: String!
+    $password: String!
+    $confirmPassword: String!
+    $phoneNumber: String!
+    $nationalId: String!
+    $email: String!
+    $role: String!
+    $userName: String!
+    $town:String!
+    $cName:String!
+    $cCode:String!
+    $cAbbrev:String!
+    $deviceToken:String!
+) {
+    registerUser(
+        request: {
+            totalRating: 0
+            averageRating: 0.0
+            firstName: $firstName
+            lastName: $lastName
+            activateUser: true
+            autoConfirmEmail: true
+            confirmPassword: $confirmPassword
+            password: $password
+            email: $email
+            phoneNumber: $phoneNumber
+            userName: $userName
+            nationalId: $nationalId
+            createdBy: "App"
+            role: $role
+            deviceDto: { deviceRegToken: $deviceToken }
+            locationDto: {
+				town: $town
+				countryDto: { name: $cName, code: $cCode, abbrev: $cAbbrev }
+			}
+        }
+    ) {
+        messages
+        succeeded
+    }
+}
+
+mutation UserLogin($email: String!, $password: String!) {
+    login(request: { email: $email, password: $password }) {
+        succeeded
+        data {
+            refreshTokenExpiryTime
+            token
+            userName
+            userImageURL
+        }
+        messages
+    }
+}
+
+mutation UpdateLicenceDocuments(
+    $email: String!
+    $updatedBy: String!
+    $licenseFront: String!
+    $licenseRear: String!
+    $nationalIdFront: String!
+    $nationalIdBack: String!
+    $id: Int!
+) {
+    updateUserDocuments(
+        request: {
+            email: $email
+            updatedBy: $updatedBy
+            identificationDocument: {
+                drivingLicenceFront: $licenseFront
+                drivingLicenceRear: $licenseRear
+                nationalIdFront: $nationalIdFront
+                nationalIdRear: $nationalIdBack
+                id: $id
+            }
+        }
+    ) {
+        succeeded
+        messages
+    }
+}
+
+mutation CreateARide(
+    $placeOfStart: String!
+    $estimatePrice: Float!
+    $name: String!
+    $destination: String!
+    $departureDate: String!
+    $estimateTime: String!
+    $estimateDistance: String!
+    $numberOfPeople: Int!
+    $maxCarry: Int!
+    $carId: String!
+    $backCentre: String
+    $backRight: String
+    $backLeft: String
+    $frontLeft: String
+    $middleCentre: String
+    $middleLeft: String
+    $middleRight: String
+    $departureTime: String!
+    $rideIndex: Int
+) {
+    createARide(
+        rideInput: {
+            seat: {
+                backCentre: $backCentre
+                backRight: $backRight
+                backLeft: $backLeft
+                frontLeft: $frontLeft
+                middleCentre: $middleCentre
+                middleLeft: $middleLeft
+                middleRight: $middleRight
+                id: ""
+            }
+            name: $name
+            placeofStart: $placeOfStart
+            estimatePrice: $estimatePrice
+            destination: $destination
+            duration: $estimateTime
+            estimateDistance: $estimateDistance
+            numberOfPeople: $numberOfPeople
+            maximumCarryWeight: $maxCarry
+            departureDate: $departureDate
+            carId: $carId
+            departureTime: $departureTime
+            rideIndex: $rideIndex
+        }
+    ) {
+        destination
+        placeofStart
+        status
+        name
+        routeIndex
+        users {
+            userId
+        }
+    }
+}
+
+mutation Transaction(
+    $phoneNumber: String!
+    $amount: String!
+    $callBackUrl: String!
+) {
+    transact(
+        request: {
+            phoneNumber: $phoneNumber
+            amount: $amount
+            callBackUrl: $callBackUrl
+        }
+    ) {
+        responseCode
+        checkoutRequestID
+        merchantRequestID
+        responseDescription
+    }
+}
+
+mutation SaveUserFile(
+    $fileName: String!
+    $fileExtension: String!
+    $uploadType: UploadType!
+    $data: String!
+) {
+    saveFlUploadeFile(
+        request: {
+            fileName: $fileName
+            extension: $fileExtension
+            uploadType: $uploadType
+            data: $data
+        }
+    )
+}
+
+mutation SaveUserFileString(
+    $fileName: String!
+    $fileExtension: String!
+    $uploadType: UploadType!
+    $data: String!
+) {
+    saveFlUploadeFile(
+        request: {
+            fileName: $fileName
+            extension: $fileExtension
+            uploadType: $uploadType
+            data: $data
+        }
+    )
+}
+
+mutation CreateCar(
+    $id: String!
+    $imageUrl: String!
+    $active: Boolean!
+    $color: String!
+    $licensePlate: String!
+    $model: String!
+    $ownerId: String!
+) {
+    createCar(
+        car: {
+            id: $id
+            imageUrl: $imageUrl
+            active: $active
+            color: $color
+            licensePlate: $licensePlate
+            model: $model
+            ownerId: $ownerId
+        }
+    ) {
+        licensePlate
+        id
+        color
+        model
+        imageUrl
+        active
+        ownerId
+    }
+}
+
+mutation AddChat(
+    $id: String!
+    $deviceRegToken: String!
+    $from: String!
+    $to: String!
+    $topic: String!
+    $message: String!
+) {
+    addChart(
+        chartMsg: {
+            id: $id
+            deviceRegToken: $deviceRegToken
+            to: $to
+            from: $from
+            message: $message
+            topic: $topic
+            dateSend: ""
+        }
+    ) {
+        id
+        to
+        from
+        message
+        topic
+        dateSend
+        deviceRegToken
+    }
+}
+ 
+mutation  ChangeUserPassword(
+    $password: String!
+    $confirmPassword: String!
+    $phoneNumber: String!
+){
+	passwordResetRequestByPhone(
+		forgotPasswordInput: {
+			password: $password
+			confirmPassword: $confirmPassword
+			phoneNumber:  $phoneNumber
+		}
+	) {
+		messages
+		succeeded
+	}
+}
+
+mutation SendOTP($phone: String!, $email: String!) {
+  verificationCode(phoneNumber: $phone, email: $email)
+}
+
+mutation LNMStatus($requestId: String!) {
+    lNMPesaStatus(checkoutRequestID: $requestId) {
+        responseCode
+        responseDescription
+        merchantRequestID
+        checkoutRequestID
+        resultCode
+        resultDesc
+    }
+}
+
+mutation TransactB2C(
+    $phoneNumber: String!
+    $amount: String!
+    $callbackUrl: String!
+    $occasion: String!
+    $remarks: String!
+    $queueTimeoutUrl: String!
+    $rideId: Int!
+    $userId: String!
+) {
+    transactB2C(
+        request: {
+            phoneNumber: $phoneNumber
+            amount: $amount
+            callBackUrl: $callbackUrl
+            occassion: $occasion
+            remarks: $remarks
+            queueTimeOutURL: $queueTimeoutUrl
+            rideId: $rideId
+            userId: $userId
+        }
+    ) {
+        conversationID
+        originatorConversationID
+        responseCode
+        responseDescription
+    }
+}
+
+mutation UpdateUserPhoneNumber($email: String!, $phoneNumber: String!) {
+  updateUserPhoneNumber(email: $email, phonenumber: $phoneNumber) {
+    messages
+    succeeded
+  }
+}
+
+
+mutation UpdateUserDetails(
+    $firstName: String
+    $lastName: String
+    $userName: String
+    $email: String!
+    $aboutMe: String!
+    $phoneNumber: String!
+) {
+    updateUser(
+        request: {
+            userName: $userName
+            firstName: $firstName
+            lastName: $lastName
+            updatedBy: $email
+            email: $email
+            aboutMe: $aboutMe
+            phoneNumber: $phoneNumber
+        }
+    ) {
+        messages
+        succeeded
+    }
+}
+
+mutation UpdateCarDetails(
+    $active: Boolean!
+    $color: String
+    $imageUrl: String
+    $licensePlate: String
+    $model: String
+    $ownerId: String
+) {
+    updateCar(
+        car: {
+            active: $active
+            color: $color
+            imageUrl: $imageUrl
+            licensePlate: $licensePlate
+            model: $model
+            ownerId: $ownerId
+        }
+    ) {
+        active
+        color
+        id
+        imageUrl
+        licensePlate
+        model
+    }
+}
+
+mutation updateFMCToken(
+    $userId: String!
+    $fcmToken: String!
+) {
+  updateFMCToken(userId: $userId, fcmToken: $fcmToken) {
+    messages
+    succeeded
+  }
+}
+
+ 
+query CheckIfUserIsDriver($driverRoleId: String!, $userId: String!) {
+    usersInRole(roleId: $driverRoleId, where: { id: { eq: $userId } }) {
+        id
+        email
+    }
+}
+
+query GetAllRoles {
+    roles {
+        data {
+            id
+            name
+            description
+        }
+    }
+}
+
+query GetDriverTrips($UserId: String, $status: String) {
+    rides(
+        where: {
+            status: { eq: $status }
+            car: { owner: { id: { eq: $UserId } } }
+        }
+    ) {
+        id
+        name
+        departureDate
+        destination
+        estimatedDistance
+        numberOfPeople
+        maximumCarryWeight
+        placeofStart 
+        duration
+        totalPay
+        status
+        car {
+            licensePlate
+        }
+    }
+}
+
+query GetPaidTrips($status: String) {
+    rides(
+        where: { status: { eq: $status } }
+    ) {
+        id
+        name
+        departureDate
+        destination
+        estimatedDistance
+        numberOfPeople
+        maximumCarryWeight
+        placeofStart 
+        duration
+        status
+        totalPay
+        car {
+            licensePlate
+        }
+    }
+}
+
+query GetUserByUserName($userName: String) {
+    users(where: { userName: { eq: $userName } }) {
+        email
+        lastName
+        firstName
+        id
+        isActive
+        nationalId
+        phoneNumber
+        userName
+        identificationDocument {
+            nationalIdFront
+            nationalIdRear
+            drivingLicenceRear
+            drivingLicenceFront
+        }
+        ownedCars {
+            id
+            active
+            color
+            licensePlate
+            model
+        }
+    }
+}
+
+query FilterToAndFromRides($searchText: String) {
+    rides(
+        where: {
+            status: { eq: "Active" }
+            or: [
+                { placeofStart: { contains: $searchText } }
+                { destination: { contains: $searchText } }
+            ]
+        }
+        order: { id: DESC }
+    ) {
+        id
+        name
+        departureDate
+        destination
+        estimatedDistance
+        numberOfPeople
+        maximumCarryWeight 
+        placeofStart
+        duration
+        departureTime
+        exactPickupLocation
+        status
+        seat {
+            id
+            backLeft
+            frontLeft
+            backCentre
+            backRight
+            middleLeft
+            middleRight
+            middleCentre
+        }
+        totalPay
+        maxTotalPay
+        seatCount
+        seatCapacity
+        estimatePrice
+        car {
+            imageUrl
+        }
+        users {
+            user {
+                id
+                userName
+                profilePictureDataUrl
+            }
+        }
+    }
+}
+
+query GetUserCars($email: String!) {
+    users(where: { email: { eq: $email } }) {
+        email
+        lastName
+        id
+        isActive
+        nationalId
+        phoneNumber
+        userName
+        ownedCars {
+            id
+            active
+            color
+            licensePlate
+            model
+            imageUrl
+            ownerId
+        }
+    }
+}
+
+query GetUserWithFilter($userName: String!) {
+    users(where: { userName: { eq: $userName } }) {
+        email
+        lastName
+        firstName
+        id
+        isActive
+        nationalId
+        phoneNumber
+        userName
+        aboutMe
+        referalCode
+        loyaltyPoints
+        profilePictureDataUrl
+         location {
+          country {
+            abbrev
+          }
+        }  
+        frequentRoutes {
+            destination
+            origin
+            id
+            color {
+                r
+                g
+                b
+                a
+            }
+        }
+        ownedCars {
+            id
+            active
+            color
+            licensePlate
+            model
+        }
+    }
+}
+
+query GetUserById($id: String!) {
+    users(where: { id: { eq: $id } }) {
+        email
+        lastName
+        firstName
+        id
+        isActive
+        nationalId
+        phoneNumber
+        userName
+        profilePictureDataUrl
+        averageRating
+        tripsCreated 
+		tripsCompleted
+		tripsCancelled
+        aboutMe 
+        referalCode
+        loyaltyPoints
+        device {
+            id
+            deviceRegToken
+        }
+        userRatings {
+			id
+			comment
+			userThatRate
+			ratingValue
+			dateOfRating            
+			reviewer {
+				firstName
+				lastName
+			}
+		}
+        ownedCars {
+            id
+            active
+            color
+            licensePlate
+            model
+        }       
+    }
+}
+
+query GetOnGoingUserBookings(
+    $userId: String!   
+) {
+    rides(
+         where: {
+      transactions: {
+        some: { passengerId: { eq: $userId} }
+      }
+      }
+        order: {departureDate:ASC}
+    ) {
+        allowedBehDesc
+        id
+        name
+        departureDate
+        departureTime
+        destination
+        duration
+        estimatedDistance
+        numberOfPeople
+        maximumCarryWeight
+        placeofStart  
+        status
+        arrivalTime
+        seat {
+            id
+            backLeft
+            frontLeft
+            backCentre
+            backRight
+            middleLeft
+            middleRight
+            middleCentre
+        }
+        totalPay
+        maxTotalPay
+        seatCount
+        seatCapacity
+        estimatePrice
+        routeIndex
+        car {
+            licensePlate
+            imageUrl
+            id
+            owner {
+                firstName
+                lastName
+                id
+                userName
+            }
+        }
+        transactions { 
+            status
+            driverId
+            passengerId
+            phoneNumber
+            amount
+            seatsStr
+            id
+        }
+        users {
+            user {
+                id
+                userName
+                profilePictureDataUrl
+            }
+        }
+    }
+}
+
+query GetPastUserBookings(
+    $userId: String!  
+) {
+    rides(
+        where: {
+      transactions: {
+        some: { passengerId: { eq: $userId} }
+      }
+    }
+        order: {departureDate:DESC}
+    ) {
+        allowedBehDesc
+        id
+        name
+        departureDate
+        departureTime
+        destination
+        duration
+        estimatedDistance
+        numberOfPeople
+        maximumCarryWeight
+        placeofStart  
+        arrivalTime
+        status
+        seat {
+            id
+            backLeft
+            frontLeft
+            backCentre
+            backRight
+            middleLeft
+            middleRight
+            middleCentre
+        }
+        totalPay
+        maxTotalPay
+        seatCount
+        seatCapacity
+        estimatePrice
+        car {
+            licensePlate
+            imageUrl
+            id
+            owner {
+                firstName
+                lastName
+                id
+                userName
+            }
+        }
+        transactions { 
+            status
+            driverId
+            passengerId
+            phoneNumber
+            amount
+            seatsStr
+            id
+            paymentMethod
+        }
+        users {
+            user {
+                id
+                userName
+                profilePictureDataUrl
+            }
+        }
+    }
+}
+
+query GetRides(
+    $from: Int
+    $to: Int
+    $placeOfStartFilter: String
+    $destinationFilter: String
+) {
+    rides(
+        where: {
+            id: { gte: $from, lt: $to } 
+            or: [
+				{ placeofStart: { contains: $placeOfStartFilter } }
+				{ destination: { contains: $destinationFilter } }
+			]
+			status: { eq: "Active" } 
+        }
+        order: {arrivalTime:ASC}
+    ) {
+        allowedBehDesc
+        id
+        name
+        departureDate
+        departureTime
+        destination
+        estimatedDistance
+        duration
+        numberOfPeople
+        maximumCarryWeight
+        placeofStart 
+        exactPickupLocation
+        exactDropOffLocation
+        routeIndex
+        status
+        seat {
+            id
+            backLeft
+            frontLeft
+            backCentre
+            backRight
+            middleLeft
+            middleRight
+            middleCentre
+        }
+        totalPay
+        maxTotalPay
+        seatCount
+        seatCapacity
+        estimatePrice
+        car {
+            licensePlate
+            imageUrl
+            color
+            model
+            ownerId
+            id
+            owner {
+                id
+                firstName
+                userName
+                profilePictureDataUrl
+                averageRating
+                tripsCreated 
+                tripsCompleted
+                tripsCancelled
+            }
+        }
+        users {
+            user {
+                id
+                userName
+                profilePictureDataUrl
+            }
+        }
+    }
+}
+
+query GetLatestRides($count: Int!) {
+  latestRides(count: $count) {
+    allowedBehDesc
+    id
+    name
+    departureDate
+    departureTime
+    destination
+    estimatedDistance
+    duration
+    numberOfPeople
+    maximumCarryWeight
+    placeofStart 
+    exactPickupLocation
+    routeIndex
+    status
+    seat {
+      id
+      backLeft
+      frontLeft
+      backCentre
+      backRight
+      middleLeft
+      middleRight
+      middleCentre
+    }
+    totalPay
+    maxTotalPay
+    seatCount
+    seatCapacity
+    estimatePrice
+    car {
+      licensePlate
+      imageUrl
+      color
+      model
+      ownerId
+      id
+      owner {
+        id
+        firstName
+        userName
+        profilePictureDataUrl
+        averageRating
+        tripsCreated
+        tripsCompleted
+        tripsCancelled
+      }
+    }
+    users {
+      user {
+        id
+        userName
+        profilePictureDataUrl
+      }
+    }
+  }
+}
+
+query GetRideInfo(
+    $rideId: Int 
+) {
+	rides(where: { id: { eq: $rideId } }) {
+		allowedBehDesc
+		id
+		name
+		departureDate
+		departureTime
+		placeofStart
+		destination
+		estimatedDistance
+		numberOfPeople
+		maximumCarryWeight 
+		arrivalTime
+		departureTime
+		duration
+		routeIndex
+		exactPickupLocation
+		routeIndex
+        status
+		seat {
+			id
+			backLeft
+			frontLeft
+			backCentre
+			backRight
+			middleLeft
+			middleRight
+			middleCentre
+		}
+		totalPay
+		maxTotalPay
+		seatCount
+		seatCapacity
+		estimatePrice
+		users {
+			userId
+			user {
+				id
+				userName
+				profilePictureDataUrl
+			}
+		}
+		car {
+			licensePlate
+			imageUrl
+			color
+			model
+			ownerId
+			id
+			owner{
+				id
+				firstName
+                userName
+                profilePictureDataUrl
+                averageRating
+                tripsCreated 
+                tripsCompleted
+                tripsCancelled
+			}
+		}
+	}
+}
+
+query GetRide(
+    $rideId: Int 
+) {
+    rides(
+        where: {
+            id: { eq: $rideId }              
+        } 
+    ) {
+        allowedBehDesc
+        id
+        name
+        departureDate
+        departureTime
+        destination
+        estimatedDistance
+        duration
+        numberOfPeople
+        maximumCarryWeight
+        placeofStart 
+        exactPickupLocation
+        routeIndex
+        status
+        seat {
+            id
+            backLeft
+            frontLeft
+            backCentre
+            backRight
+            middleLeft
+            middleRight
+            middleCentre
+        }
+        totalPay
+        maxTotalPay
+        seatCount
+        seatCapacity
+        estimatePrice
+        car {
+            licensePlate
+            imageUrl
+            color
+            model
+            ownerId
+            id
+            owner {
+                id
+                firstName
+                userName
+                profilePictureDataUrl
+                averageRating
+                tripsCreated 
+                tripsCompleted
+                tripsCancelled
+            }
+        }
+        users {
+            user {
+                id
+                userName
+                profilePictureDataUrl
+            }
+        }
+    }
+}
+
+query GetRidesWithFilter($from: Int, $to: Int) {
+    rides(
+        where: 
+        { 
+            id: 
+            { gte: $from, lt: $to } 
+        }
+        order: {arrivalTime:ASC}
+        ) 
+        {
+        allowedBehDesc
+        id
+        name
+        departureDate
+        departureTime
+        destination
+        estimatedDistance
+        numberOfPeople
+        maximumCarryWeight
+        placeofStart 
+        duration
+        routeIndex
+        status
+        seat {
+            id
+            backLeft
+            frontLeft
+            backCentre
+            backRight
+            middleLeft
+            middleRight
+            middleCentre
+        }
+        totalPay
+        maxTotalPay
+        seatCount
+        seatCapacity
+        estimatePrice
+        car {
+            licensePlate
+            imageUrl
+            id
+            owner {
+                id
+                firstName
+                userName
+                profilePictureDataUrl
+                averageRating
+                tripsCreated 
+                tripsCompleted
+                tripsCancelled
+            }
+        }
+        users {
+            user {
+                id
+                userName
+                profilePictureDataUrl
+            }
+        }
+    }
+}
+
+query GetDestinationRides($placeOfStart: String!, $destination: String!) {
+    rides(
+        where: {
+            status: { eq: "Active" }
+            and: {
+                placeofStart: { eq: $placeOfStart }
+                and: { destination: { eq: $destination } }
+            }
+        }
+        order: {arrivalTime:ASC}
+    ) {
+        allowedBehDesc
+        id
+        name
+        departureDate
+        departureTime
+        destination
+        duration
+        estimatedDistance
+        numberOfPeople
+        maximumCarryWeight
+        placeofStart  
+        status
+        seat {
+            id
+            backLeft
+            frontLeft
+            backCentre
+            backRight
+            middleLeft
+            middleRight
+            middleCentre
+        }
+        totalPay
+        maxTotalPay
+        seatCount
+        seatCapacity
+        estimatePrice
+        car {
+            licensePlate
+            imageUrl
+            id
+            owner {
+                firstName
+                id
+            }
+        }
+        users {
+            user {
+                id
+                userName
+                profilePictureDataUrl
+            }
+        }
+    }
+} 
+
+subscription OnGetMessage {
+  onGetMessage {
+    id
+    to
+    from
+    message
+    topic
+    dateSend 
+  }
+}
+
+

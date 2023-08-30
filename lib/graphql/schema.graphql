@@ -1,0 +1,1776 @@
+"""
+The `@defer` directive may be provided for fragment spreads and inline fragments to inform the executor to delay the execution of the current fragment to indicate deprioritization of the current fragment. A query with `@defer` directive will cause the request to potentially return multiple responses, where non-deferred data is delivered in the initial response and data deferred is delivered in a subsequent response. `@include` and `@skip` take precedence over `@defer`.
+"""
+directive @defer(
+  """
+  If this argument label has a value other than null, it will be passed on to the result of this defer directive. This label is intended to give client applications a way to identify to which fragment a deferred result belongs to.
+  """
+  label: String
+
+  """
+  Deferred when true.
+  """
+  if: Boolean
+) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"""
+The `@stream` directive may be provided for a field of `List` type so that the backend can leverage technology such as asynchronous iterators to provide a partial list in the initial response, and additional list items in subsequent responses. `@include` and `@skip` take precedence over `@stream`.
+"""
+directive @stream(
+  """
+  If this argument label has a value other than null, it will be passed on to the result of this stream directive. This label is intended to give client applications a way to identify to which fragment a streamed result belongs to.
+  """
+  label: String
+
+  """
+  The initial elements that shall be send down to the consumer.
+  """
+  initialCount: Int! = 0
+
+  """
+  Streamed when true.
+  """
+  if: Boolean
+) on FIELD
+
+type Query {
+  profilePicture: IResult!
+  allRoleClaims: AppResultOfListOfRoleClaimResponse!
+  roleClaimCount: Int!
+  roleClaimById(id: Int!): AppResultOfRoleClaimResponse!
+  roleClaimByRoleId(roleId: String!): AppResultOfListOfRoleClaimResponse!
+  roles: AppResultOfListOfRoleResponse!
+  roleById(id: String!): AppResultOfRoleResponse!
+  rolesCount: Int!
+  allPermissionsForRole(roleId: String!): AppResultOfPermissionResponse!
+  usersInRole(
+    roleId: String!
+    where: SafiriCarUserFilterInput
+    order: [SafiriCarUserSortInput!]
+  ): [SafiriCarUser!]!
+  users(
+    where: SafiriCarUserFilterInput
+    order: [SafiriCarUserSortInput!]
+  ): [SafiriCarUser!]!
+  currentUser: String!
+  userCount: Int!
+  user(id: String!): SafiriCarUser!
+  userRoles: AppResultOfUserRolesResponse!
+  confirmEmail(code: String!): AppResultOfString!
+  forgotPassword(request: ForgotPasswordRequestInput!): AppResult!
+  resetPassword(request: ResetPasswordRequestInput!): AppResult!
+  registerUser(request: RegisterRequestInput!): AppResult!
+  toggleUserStatus(request: ToggleUserStatusRequestInput!): AppResult!
+  contactInfo: AppResultOfListOfContactUs!
+  location(
+    where: LocationFilterInput
+    order: [LocationSortInput!]
+  ): [Location!]!
+  requests(
+    where: APIRequestFilterInput
+    order: [APIRequestSortInput!]
+  ): [APIRequest!]!
+  rides(where: RideFilterInput, order: [RideSortInput!]): [Ride!]!
+  latestRides(
+    count: Int!
+    where: RideFilterInput
+    order: [RideSortInput!]
+  ): [Ride!]!
+  ridesCount: Int!
+  ridesLastIndex: Int!
+  rideBookings(
+    where: UserRidesFilterInput
+    order: [UserRidesSortInput!]
+  ): [UserRides!]!
+  transactions(
+    where: RideTransactionFilterInput
+    order: [RideTransactionSortInput!]
+  ): [RideTransaction!]!
+  chats(
+    where: PamrideMessageFilterInput
+    order: [PamrideMessageSortInput!]
+  ): [PamrideMessage!]!
+  subscriberEmails: [SubscriberEmail!]!
+  downloadFile(request: DownloadRequestInput!): FileDownloadResponse!
+  cars(where: CarFilterInput, order: [CarSortInput!]): [Car!]!
+}
+
+type Mutation {
+  changePassword(changePassword: ChangePasswordRequestInput!): IResult!
+  passwordResetRequestByPhone(
+    forgotPasswordInput: PasswordResetRequestByPhoneInput!
+  ): IResult!
+  updateProfile(request: UpdateProfileRequestInput!): IResult!
+  updateProfilePicture(imagename: String!, username: String!): IResult!
+  addUserToRole(userId: String!, roleName: String!): IResult!
+  login(request: TokenRequestInput!): AppResultOfTokenResponse!
+  accessToken(model: ResfreshTokenRequestInput!): AppResultOfTokenResponse!
+  logOut: AppResultOfBoolean!
+  verifyUserAccount(userIdToVerifyAccount: String!): AppResultOfBoolean!
+  updateUserRating(
+    userIdToUpdateRating: String!
+    userIdUpdating: String!
+    newRating: Float!
+    ride: Int!
+    comment: String!
+  ): AppResultOfBoolean!
+  createFrequentRoute(frequentRoute: FrequentRouteInput!): AppResultOfBoolean!
+  removeFrequentRoute(username: String!, rideId: Int!): AppResultOfBoolean!
+  activateUserAccount(userIdToActivateAccount: String!): AppResultOfBoolean!
+  disableUserAccount(userIdToDisableAccount: String!): AppResultOfBoolean!
+  verificationCode(phoneNumber: String!, email: String!): String!
+  createRole(request: RoleRequestInput!): AppResultOfString!
+  updateRole(request: RoleRequestInput!): AppResultOfString!
+  deleteRole(id: String!): AppResultOfString!
+  updatePermissions(request: PermissionRequestInput!): AppResultOfString!
+  createRoleClaim(request: RoleClaimRequestInput!): AppResultOfString!
+  deleteRoleClaim(id: Int!): AppResultOfString!
+  updateUserRoles(request: UpdateUserRolesRequestInput!): AppResult!
+  confirmEmail(code: String!): AppResultOfString!
+  forgotPassword(request: ForgotPasswordRequestInput!): AppResult!
+  resetPassword(request: ResetPasswordRequestInput!): AppResult!
+  registerUser(request: RegisterRequestInput!): AppResult!
+  updateUser(request: UpdateRequestInput!): AppResult!
+  updateUserPhoneNumber(email: String!, phonenumber: String!): AppResult!
+  updateUserDocuments(
+    request: UpdateIdentificationDocumentRequestInput!
+  ): AppResult!
+  toggleUserStatus(request: ToggleUserStatusRequestInput!): AppResult!
+  deleteUser(userName: String!): AppResult!
+  contactUs(request: ContactUsRequestInput!): AppResult!
+  updateFMCToken(userId: String!, fcmToken: String!): AppResult!
+  createARide(rideInput: CreateRideRequestInput!): Ride!
+  cutCommisionPassengerCancelRide(amount: Float!): Int!
+  cutCommisionDriverCancelRide(amount: Float!): Float!
+  cutCommisionAndCostTotalPay(amount: Float!): Float!
+  transact(request: TransactRequestInput!): LipaNaMpesaResponse!
+  lNMPesaStatus(checkoutRequestID: String!): LipaNaMpesaOnlineStatusResponse!
+  transactB2C(request: TransactB2CRequestInput!): B2CResponse!
+  b2CStatus(
+    transactionStatusRequest: TransactionStatusRequestDtoInput!
+  ): TransactionStatusResponse!
+  reverse(reverseRequest: ReverseRequestInput!): ReverseResponse!
+  addChart(chartMsg: ChartDtoInput!): ChartDto!
+  saveEmailSubscribed(request: SubscriberEmailInput!): SubscriberEmail!
+  saveUploadeFile(request: UploadRequestInput!): String!
+  saveFlUploadeFile(request: UploadRequestFlInput!): String!
+  createCar(car: CarInput!): Car!
+  updateCar(car: CarUpdateDtoInput!): Car!
+  deleteCar(licensePlate: String!): Car!
+}
+
+"""
+Represents the Users: Drivers, Passenger, Admins
+"""
+type SafiriCarUser {
+  firstName: String
+
+  """
+  List of cars owned by a driver
+  """
+  ownedCars: [Car!]!
+  lastName: String!
+  nationalId: String!
+  createdBy: String!
+  profilePictureDataUrl: String!
+  referalCode: String
+  identificationDocument: IdentificationDocument
+  createdOn: DateTime
+  lastModifiedOn: DateTime
+  isActive: Boolean!
+  role: String
+  totalRating: Int!
+  averageRating: Float!
+  tripsCreated: Int!
+  tripsCompleted: Int!
+  tripsCancelled: Int!
+  isVerified: Boolean!
+  aboutMe: String
+  loyaltyPoints: Float!
+  location: Location
+  device: Device
+  rides: [UserRides!]!
+  userRatings: [UserRating!]!
+  frequentRoutes: [FrequentRoute!]!
+  userReferals: [SafiriCarUser!]
+  id: String
+  userName: String
+  email: String
+  emailConfirmed: Boolean!
+  phoneNumber: String
+  phoneNumberConfirmed: Boolean!
+  lockoutEnd: DateTime
+  accessFailedCount: Int!
+}
+
+"""
+Represents Safiri System Roles
+"""
+type UserRolesResponse {
+  """
+  A list of User Roles
+  """
+  userRoles: [UserRoleModel!]!
+}
+
+"""
+Response Object when Login in
+"""
+type TokenResponse {
+  """
+  Jwt Token to access the Api
+  """
+  token: String!
+  refreshToken: String!
+  userImageURL: String!
+  userName: String!
+  refreshTokenExpiryTime: DateTime
+}
+
+"""
+Response Object when Login in
+"""
+type RoleClaimResponse {
+  """
+  The role id
+  """
+  roleId: String!
+  id: Int!
+  type: String!
+  value: String!
+  description: String!
+  group: String!
+  selected: Boolean!
+}
+
+"""
+Car Object
+"""
+type Car {
+  """
+  Owners LicensePlate for Car
+  """
+  licensePlate: String!
+  id: String!
+  color: String!
+  model: String!
+  imageUrl: String!
+  active: Boolean!
+  ownerId: String!
+  owner: SafiriCarUser
+  rides: [Ride!]
+}
+
+type Subscription {
+  onGetMessage: PamrideMessage!
+}
+
+type IdentificationDocument {
+  id: Int!
+  nationalIdFront: String
+  nationalIdRear: String
+  drivingLicenceFront: String
+  drivingLicenceRear: String
+}
+
+"""
+The `DateTime` scalar represents an ISO-8601 compliant date time type.
+"""
+scalar DateTime
+
+type Location {
+  id: Int!
+  town: String!
+  isPopular: Boolean!
+  country: Country!
+  createdOn: DateTime
+  createdBy: String
+  lastModifiedOn: DateTime
+  lastModifiedBy: String
+}
+
+type Device {
+  id: Int!
+  deviceRegToken: String!
+  createdOn: DateTime
+  createdBy: String
+  lastModifiedOn: DateTime
+  lastModifiedBy: String
+}
+
+type UserRides {
+  userId: String
+  user: SafiriCarUser
+  rideId: Int!
+  ride: Ride
+  transactions: [RideTransaction!]
+}
+
+type UserRating {
+  id: Int!
+  userThatRate: String
+  userToRate: String
+  ratingValue: Float!
+  rideId: Int!
+  levelOfSatisfaction: String
+  comment: String
+  dateOfRating: DateTime!
+  timeOfRating: TimeSpan!
+  dateOfLastUpadte: DateTime!
+  timeOfLastUpdate: TimeSpan!
+  reviewer: SafiriCarUser!
+}
+
+type FrequentRoute {
+  origin: String!
+  destination: String!
+  image: String!
+  color: ColorCustom!
+  userId: String!
+  createdDate: DateTime
+  id: Int!
+}
+
+type UserRoleModel {
+  roleName: String!
+  roleDescription: String!
+  selected: Boolean!
+}
+
+type Ride {
+  id: Int!
+  name: String
+  placeofStart: String
+  destination: String
+  driverId: String
+  estimatePrice: Float!
+  estimatedDistance: String
+  numberOfPeople: Int!
+  maximumCarryWeight: Int!
+  departureDate: DateTime!
+  duration: String
+  status: String
+  seat: Seat
+  seatCount: Int!
+  seatCapacity: Int!
+  maxTotalPay: Float!
+  totalPay: Float!
+  amountCashedOut: Decimal!
+  departureTime: TimeSpan
+  arrivalTime: DateTime!
+  allowedBehDesc: String
+  exactPickupLocation: String
+  routeIndex: Int
+  mpesaReceiptNumber: String!
+  transactionDate: DateTime!
+  merchantRequestId: String!
+  checkoutRequestId: String!
+  compensatedFromPassengerCancel: Float!
+  driverPaymentTime: DateTime
+  exactDropOffLocation: String
+  isRecurring: Boolean
+  carId: String!
+  car: Car
+  users: [UserRides!]
+  transactions: [RideTransaction!]
+}
+
+input SafiriCarUserFilterInput {
+  and: [SafiriCarUserFilterInput!]
+  or: [SafiriCarUserFilterInput!]
+  firstName: StringOperationFilterInput
+  lastName: StringOperationFilterInput
+  nationalId: StringOperationFilterInput
+  ownedCars: ListFilterInputTypeOfCarFilterInput
+  createdBy: StringOperationFilterInput
+  profilePictureDataUrl: StringOperationFilterInput
+  referalCode: StringOperationFilterInput
+  identificationDocument: IdentificationDocumentFilterInput
+  createdOn: ComparableNullableOfDateTimeOperationFilterInput
+  lastModifiedBy: StringOperationFilterInput
+  lastModifiedOn: ComparableNullableOfDateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+  deletedOn: ComparableNullableOfDateTimeOperationFilterInput
+  isActive: BooleanOperationFilterInput
+  refreshToken: StringOperationFilterInput
+  role: StringOperationFilterInput
+  refreshTokenExpiryTime: ComparableNullableOfDateTimeOperationFilterInput
+  totalRating: ComparableInt32OperationFilterInput
+  averageRating: ComparableDoubleOperationFilterInput
+  tripsCreated: ComparableInt32OperationFilterInput
+  tripsCompleted: ComparableInt32OperationFilterInput
+  tripsCancelled: ComparableInt32OperationFilterInput
+  isVerified: BooleanOperationFilterInput
+  aboutMe: StringOperationFilterInput
+  loyaltyPoints: ComparableSingleOperationFilterInput
+  location: LocationFilterInput
+  device: DeviceFilterInput
+  rides: ListFilterInputTypeOfUserRidesFilterInput
+  userRatings: ListFilterInputTypeOfUserRatingFilterInput
+  frequentRoutes: ListFilterInputTypeOfFrequentRouteFilterInput
+  userReferals: ListFilterInputTypeOfSafiriCarUserFilterInput
+  id: StringOperationFilterInput
+  userName: StringOperationFilterInput
+  normalizedUserName: StringOperationFilterInput
+  email: StringOperationFilterInput
+  normalizedEmail: StringOperationFilterInput
+  emailConfirmed: BooleanOperationFilterInput
+  passwordHash: StringOperationFilterInput
+  securityStamp: StringOperationFilterInput
+  concurrencyStamp: StringOperationFilterInput
+  phoneNumber: StringOperationFilterInput
+  phoneNumberConfirmed: BooleanOperationFilterInput
+  twoFactorEnabled: BooleanOperationFilterInput
+  lockoutEnd: ComparableNullableOfDateTimeOffsetOperationFilterInput
+  lockoutEnabled: BooleanOperationFilterInput
+  accessFailedCount: ComparableInt32OperationFilterInput
+}
+
+input SafiriCarUserSortInput {
+  firstName: SortEnumType
+  lastName: SortEnumType
+  nationalId: SortEnumType
+  createdBy: SortEnumType
+  profilePictureDataUrl: SortEnumType
+  referalCode: SortEnumType
+  identificationDocument: IdentificationDocumentSortInput
+  createdOn: SortEnumType
+  lastModifiedBy: SortEnumType
+  lastModifiedOn: SortEnumType
+  isDeleted: SortEnumType
+  deletedOn: SortEnumType
+  isActive: SortEnumType
+  refreshToken: SortEnumType
+  role: SortEnumType
+  refreshTokenExpiryTime: SortEnumType
+  totalRating: SortEnumType
+  averageRating: SortEnumType
+  tripsCreated: SortEnumType
+  tripsCompleted: SortEnumType
+  tripsCancelled: SortEnumType
+  isVerified: SortEnumType
+  aboutMe: SortEnumType
+  loyaltyPoints: SortEnumType
+  location: LocationSortInput
+  device: DeviceSortInput
+  id: SortEnumType
+  userName: SortEnumType
+  normalizedUserName: SortEnumType
+  email: SortEnumType
+  normalizedEmail: SortEnumType
+  emailConfirmed: SortEnumType
+  passwordHash: SortEnumType
+  securityStamp: SortEnumType
+  concurrencyStamp: SortEnumType
+  phoneNumber: SortEnumType
+  phoneNumberConfirmed: SortEnumType
+  twoFactorEnabled: SortEnumType
+  lockoutEnd: SortEnumType
+  lockoutEnabled: SortEnumType
+  accessFailedCount: SortEnumType
+}
+
+input LocationFilterInput {
+  and: [LocationFilterInput!]
+  or: [LocationFilterInput!]
+  id: ComparableInt32OperationFilterInput
+  town: StringOperationFilterInput
+  isPopular: BooleanOperationFilterInput
+  country: CountryFilterInput
+  createdOn: ComparableNullableOfDateTimeOperationFilterInput
+  createdBy: StringOperationFilterInput
+  lastModifiedOn: ComparableNullableOfDateTimeOperationFilterInput
+  lastModifiedBy: StringOperationFilterInput
+}
+
+input LocationSortInput {
+  id: SortEnumType
+  town: SortEnumType
+  isPopular: SortEnumType
+  country: CountrySortInput
+  createdOn: SortEnumType
+  createdBy: SortEnumType
+  lastModifiedOn: SortEnumType
+  lastModifiedBy: SortEnumType
+}
+
+input APIRequestFilterInput {
+  and: [APIRequestFilterInput!]
+  or: [APIRequestFilterInput!]
+  id: StringOperationFilterInput
+  iPAddress: StringOperationFilterInput
+  uAString: StringOperationFilterInput
+  languages: StringOperationFilterInput
+  path: StringOperationFilterInput
+  statusCode: ComparableInt32OperationFilterInput
+  createdOn: ComparableDateTimeOperationFilterInput
+}
+
+input APIRequestSortInput {
+  id: SortEnumType
+  iPAddress: SortEnumType
+  uAString: SortEnumType
+  languages: SortEnumType
+  path: SortEnumType
+  statusCode: SortEnumType
+  createdOn: SortEnumType
+}
+
+input RideFilterInput {
+  and: [RideFilterInput!]
+  or: [RideFilterInput!]
+  id: ComparableInt32OperationFilterInput
+  name: StringOperationFilterInput
+  placeofStart: StringOperationFilterInput
+  destination: StringOperationFilterInput
+  driverId: StringOperationFilterInput
+  estimatePrice: ComparableSingleOperationFilterInput
+  estimatedDistance: StringOperationFilterInput
+  numberOfPeople: ComparableInt32OperationFilterInput
+  maximumCarryWeight: ComparableInt32OperationFilterInput
+  departureDate: ComparableDateTimeOperationFilterInput
+  duration: StringOperationFilterInput
+  status: StringOperationFilterInput
+  seat: SeatFilterInput
+  seatCount: ComparableInt32OperationFilterInput
+  seatCapacity: ComparableInt32OperationFilterInput
+  maxTotalPay: ComparableSingleOperationFilterInput
+  totalPay: ComparableSingleOperationFilterInput
+  amountCashedOut: ComparableDecimalOperationFilterInput
+  departureTime: ComparableNullableOfTimeSpanOperationFilterInput
+  arrivalTime: ComparableDateTimeOperationFilterInput
+  allowedBehDesc: StringOperationFilterInput
+  exactPickupLocation: StringOperationFilterInput
+  routeIndex: ComparableNullableOfInt32OperationFilterInput
+  mpesaReceiptNumber: StringOperationFilterInput
+  transactionDate: ComparableDateTimeOperationFilterInput
+  merchantRequestId: StringOperationFilterInput
+  checkoutRequestId: StringOperationFilterInput
+  compensatedFromPassengerCancel: ComparableSingleOperationFilterInput
+  driverPaymentTime: ComparableNullableOfDateTimeOperationFilterInput
+  exactDropOffLocation: StringOperationFilterInput
+  isRecurring: BooleanOperationFilterInput
+  carId: StringOperationFilterInput
+  car: CarFilterInput
+  users: ListFilterInputTypeOfUserRidesFilterInput
+  transactions: ListFilterInputTypeOfRideTransactionFilterInput
+}
+
+input RideSortInput {
+  id: SortEnumType
+  name: SortEnumType
+  placeofStart: SortEnumType
+  destination: SortEnumType
+  driverId: SortEnumType
+  estimatePrice: SortEnumType
+  estimatedDistance: SortEnumType
+  numberOfPeople: SortEnumType
+  maximumCarryWeight: SortEnumType
+  departureDate: SortEnumType
+  duration: SortEnumType
+  status: SortEnumType
+  seat: SeatSortInput
+  seatCount: SortEnumType
+  seatCapacity: SortEnumType
+  maxTotalPay: SortEnumType
+  totalPay: SortEnumType
+  amountCashedOut: SortEnumType
+  departureTime: SortEnumType
+  arrivalTime: SortEnumType
+  allowedBehDesc: SortEnumType
+  exactPickupLocation: SortEnumType
+  routeIndex: SortEnumType
+  mpesaReceiptNumber: SortEnumType
+  transactionDate: SortEnumType
+  merchantRequestId: SortEnumType
+  checkoutRequestId: SortEnumType
+  compensatedFromPassengerCancel: SortEnumType
+  driverPaymentTime: SortEnumType
+  exactDropOffLocation: SortEnumType
+  isRecurring: SortEnumType
+  carId: SortEnumType
+  car: CarSortInput
+}
+
+input UserRidesFilterInput {
+  and: [UserRidesFilterInput!]
+  or: [UserRidesFilterInput!]
+  userId: StringOperationFilterInput
+  user: SafiriCarUserFilterInput
+  rideId: ComparableInt32OperationFilterInput
+  ride: RideFilterInput
+  transactions: ListFilterInputTypeOfRideTransactionFilterInput
+}
+
+input UserRidesSortInput {
+  userId: SortEnumType
+  user: SafiriCarUserSortInput
+  rideId: SortEnumType
+  ride: RideSortInput
+}
+
+input RideTransactionFilterInput {
+  and: [RideTransactionFilterInput!]
+  or: [RideTransactionFilterInput!]
+  id: StringOperationFilterInput
+  phoneNumber: StringOperationFilterInput
+  amount: ComparableSingleOperationFilterInput
+  isReversed: BooleanOperationFilterInput
+  status: StringOperationFilterInput
+  bookedRideId: ComparableInt32OperationFilterInput
+  passengerId: StringOperationFilterInput
+  driverId: StringOperationFilterInput
+  transactionCode: StringOperationFilterInput
+  merchantRequestId: StringOperationFilterInput
+  checkoutRequestId: StringOperationFilterInput
+  transactionDate: ComparableNullableOfDateTimeOperationFilterInput
+  transactionTime: ComparableNullableOfTimeSpanOperationFilterInput
+  approvedDateTime: ComparableDateTimeOperationFilterInput
+  transactionID: StringOperationFilterInput
+  conversationID: StringOperationFilterInput
+  originatorConversationID: StringOperationFilterInput
+  reversedDate: StringOperationFilterInput
+  reversedTime: StringOperationFilterInput
+  reseaonForReversal: StringOperationFilterInput
+  seatsStr: StringOperationFilterInput
+  paymentMethod: StringOperationFilterInput
+  exactDropOffLocation: StringOperationFilterInput
+}
+
+input RideTransactionSortInput {
+  id: SortEnumType
+  phoneNumber: SortEnumType
+  amount: SortEnumType
+  isReversed: SortEnumType
+  status: SortEnumType
+  bookedRideId: SortEnumType
+  passengerId: SortEnumType
+  driverId: SortEnumType
+  transactionCode: SortEnumType
+  merchantRequestId: SortEnumType
+  checkoutRequestId: SortEnumType
+  transactionDate: SortEnumType
+  transactionTime: SortEnumType
+  approvedDateTime: SortEnumType
+  transactionID: SortEnumType
+  conversationID: SortEnumType
+  originatorConversationID: SortEnumType
+  reversedDate: SortEnumType
+  reversedTime: SortEnumType
+  reseaonForReversal: SortEnumType
+  seatsStr: SortEnumType
+  paymentMethod: SortEnumType
+  exactDropOffLocation: SortEnumType
+}
+
+input PamrideMessageFilterInput {
+  and: [PamrideMessageFilterInput!]
+  or: [PamrideMessageFilterInput!]
+  id: StringOperationFilterInput
+  from: StringOperationFilterInput
+  to: StringOperationFilterInput
+  dateSend: ComparableNullableOfDateTimeOperationFilterInput
+  message: StringOperationFilterInput
+  topic: StringOperationFilterInput
+  updated: ComparableNullableOfDateTimeOperationFilterInput
+  updatedAt: ComparableNullableOfTimeSpanOperationFilterInput
+}
+
+input PamrideMessageSortInput {
+  id: SortEnumType
+  from: SortEnumType
+  to: SortEnumType
+  dateSend: SortEnumType
+  message: SortEnumType
+  topic: SortEnumType
+  updated: SortEnumType
+  updatedAt: SortEnumType
+}
+
+input CarFilterInput {
+  and: [CarFilterInput!]
+  or: [CarFilterInput!]
+  id: StringOperationFilterInput
+  color: StringOperationFilterInput
+  model: StringOperationFilterInput
+  licensePlate: StringOperationFilterInput
+  imageUrl: StringOperationFilterInput
+  active: BooleanOperationFilterInput
+  ownerId: StringOperationFilterInput
+  owner: SafiriCarUserFilterInput
+  rides: ListFilterInputTypeOfRideFilterInput
+}
+
+input CarSortInput {
+  id: SortEnumType
+  color: SortEnumType
+  model: SortEnumType
+  licensePlate: SortEnumType
+  imageUrl: SortEnumType
+  active: SortEnumType
+  ownerId: SortEnumType
+  owner: SafiriCarUserSortInput
+}
+
+input StringOperationFilterInput {
+  and: [StringOperationFilterInput!]
+  or: [StringOperationFilterInput!]
+  eq: String
+  neq: String
+  contains: String
+  ncontains: String
+  in: [String]
+  nin: [String]
+  startsWith: String
+  nstartsWith: String
+  endsWith: String
+  nendsWith: String
+}
+
+input ListFilterInputTypeOfCarFilterInput {
+  all: CarFilterInput
+  none: CarFilterInput
+  some: CarFilterInput
+  any: Boolean
+}
+
+input IdentificationDocumentFilterInput {
+  and: [IdentificationDocumentFilterInput!]
+  or: [IdentificationDocumentFilterInput!]
+  id: ComparableInt32OperationFilterInput
+  nationalIdFront: StringOperationFilterInput
+  nationalIdRear: StringOperationFilterInput
+  drivingLicenceFront: StringOperationFilterInput
+  drivingLicenceRear: StringOperationFilterInput
+}
+
+input ComparableNullableOfDateTimeOperationFilterInput {
+  eq: DateTime
+  neq: DateTime
+  in: [DateTime]
+  nin: [DateTime]
+  gt: DateTime
+  ngt: DateTime
+  gte: DateTime
+  ngte: DateTime
+  lt: DateTime
+  nlt: DateTime
+  lte: DateTime
+  nlte: DateTime
+}
+
+input BooleanOperationFilterInput {
+  eq: Boolean
+  neq: Boolean
+}
+
+input ComparableInt32OperationFilterInput {
+  eq: Int
+  neq: Int
+  in: [Int!]
+  nin: [Int!]
+  gt: Int
+  ngt: Int
+  gte: Int
+  ngte: Int
+  lt: Int
+  nlt: Int
+  lte: Int
+  nlte: Int
+}
+
+input ComparableDoubleOperationFilterInput {
+  eq: Float
+  neq: Float
+  in: [Float!]
+  nin: [Float!]
+  gt: Float
+  ngt: Float
+  gte: Float
+  ngte: Float
+  lt: Float
+  nlt: Float
+  lte: Float
+  nlte: Float
+}
+
+input ComparableSingleOperationFilterInput {
+  eq: Float
+  neq: Float
+  in: [Float!]
+  nin: [Float!]
+  gt: Float
+  ngt: Float
+  gte: Float
+  ngte: Float
+  lt: Float
+  nlt: Float
+  lte: Float
+  nlte: Float
+}
+
+input DeviceFilterInput {
+  and: [DeviceFilterInput!]
+  or: [DeviceFilterInput!]
+  id: ComparableInt32OperationFilterInput
+  deviceRegToken: StringOperationFilterInput
+  createdOn: ComparableNullableOfDateTimeOperationFilterInput
+  createdBy: StringOperationFilterInput
+  lastModifiedOn: ComparableNullableOfDateTimeOperationFilterInput
+  lastModifiedBy: StringOperationFilterInput
+}
+
+input ListFilterInputTypeOfUserRidesFilterInput {
+  all: UserRidesFilterInput
+  none: UserRidesFilterInput
+  some: UserRidesFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfUserRatingFilterInput {
+  all: UserRatingFilterInput
+  none: UserRatingFilterInput
+  some: UserRatingFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfFrequentRouteFilterInput {
+  all: FrequentRouteFilterInput
+  none: FrequentRouteFilterInput
+  some: FrequentRouteFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfSafiriCarUserFilterInput {
+  all: SafiriCarUserFilterInput
+  none: SafiriCarUserFilterInput
+  some: SafiriCarUserFilterInput
+  any: Boolean
+}
+
+input ComparableNullableOfDateTimeOffsetOperationFilterInput {
+  eq: DateTime
+  neq: DateTime
+  in: [DateTime]
+  nin: [DateTime]
+  gt: DateTime
+  ngt: DateTime
+  gte: DateTime
+  ngte: DateTime
+  lt: DateTime
+  nlt: DateTime
+  lte: DateTime
+  nlte: DateTime
+}
+
+enum SortEnumType {
+  ASC
+  DESC
+}
+
+input IdentificationDocumentSortInput {
+  id: SortEnumType
+  nationalIdFront: SortEnumType
+  nationalIdRear: SortEnumType
+  drivingLicenceFront: SortEnumType
+  drivingLicenceRear: SortEnumType
+}
+
+input DeviceSortInput {
+  id: SortEnumType
+  deviceRegToken: SortEnumType
+  createdOn: SortEnumType
+  createdBy: SortEnumType
+  lastModifiedOn: SortEnumType
+  lastModifiedBy: SortEnumType
+}
+
+input CountryFilterInput {
+  and: [CountryFilterInput!]
+  or: [CountryFilterInput!]
+  id: ComparableInt32OperationFilterInput
+  name: StringOperationFilterInput
+  code: StringOperationFilterInput
+  abbrev: StringOperationFilterInput
+}
+
+input CountrySortInput {
+  id: SortEnumType
+  name: SortEnumType
+  code: SortEnumType
+  abbrev: SortEnumType
+}
+
+input ComparableDateTimeOperationFilterInput {
+  eq: DateTime
+  neq: DateTime
+  in: [DateTime!]
+  nin: [DateTime!]
+  gt: DateTime
+  ngt: DateTime
+  gte: DateTime
+  ngte: DateTime
+  lt: DateTime
+  nlt: DateTime
+  lte: DateTime
+  nlte: DateTime
+}
+
+input SeatFilterInput {
+  and: [SeatFilterInput!]
+  or: [SeatFilterInput!]
+  id: StringOperationFilterInput
+  frontLeft: StringOperationFilterInput
+  middleLeft: StringOperationFilterInput
+  middleCentre: StringOperationFilterInput
+  middleRight: StringOperationFilterInput
+  backLeft: StringOperationFilterInput
+  backCentre: StringOperationFilterInput
+  backRight: StringOperationFilterInput
+}
+
+input ComparableDecimalOperationFilterInput {
+  eq: Decimal
+  neq: Decimal
+  in: [Decimal!]
+  nin: [Decimal!]
+  gt: Decimal
+  ngt: Decimal
+  gte: Decimal
+  ngte: Decimal
+  lt: Decimal
+  nlt: Decimal
+  lte: Decimal
+  nlte: Decimal
+}
+
+input ComparableNullableOfTimeSpanOperationFilterInput {
+  eq: TimeSpan
+  neq: TimeSpan
+  in: [TimeSpan]
+  nin: [TimeSpan]
+  gt: TimeSpan
+  ngt: TimeSpan
+  gte: TimeSpan
+  ngte: TimeSpan
+  lt: TimeSpan
+  nlt: TimeSpan
+  lte: TimeSpan
+  nlte: TimeSpan
+}
+
+input ComparableNullableOfInt32OperationFilterInput {
+  eq: Int
+  neq: Int
+  in: [Int]
+  nin: [Int]
+  gt: Int
+  ngt: Int
+  gte: Int
+  ngte: Int
+  lt: Int
+  nlt: Int
+  lte: Int
+  nlte: Int
+}
+
+input ListFilterInputTypeOfRideTransactionFilterInput {
+  all: RideTransactionFilterInput
+  none: RideTransactionFilterInput
+  some: RideTransactionFilterInput
+  any: Boolean
+}
+
+input SeatSortInput {
+  id: SortEnumType
+  frontLeft: SortEnumType
+  middleLeft: SortEnumType
+  middleCentre: SortEnumType
+  middleRight: SortEnumType
+  backLeft: SortEnumType
+  backCentre: SortEnumType
+  backRight: SortEnumType
+}
+
+input ListFilterInputTypeOfRideFilterInput {
+  all: RideFilterInput
+  none: RideFilterInput
+  some: RideFilterInput
+  any: Boolean
+}
+
+input UserRatingFilterInput {
+  and: [UserRatingFilterInput!]
+  or: [UserRatingFilterInput!]
+  id: ComparableInt32OperationFilterInput
+  userThatRate: StringOperationFilterInput
+  userToRate: StringOperationFilterInput
+  ratingValue: ComparableDoubleOperationFilterInput
+  rideId: ComparableInt32OperationFilterInput
+  levelOfSatisfaction: StringOperationFilterInput
+  comment: StringOperationFilterInput
+  dateOfRating: ComparableDateTimeOperationFilterInput
+  timeOfRating: ComparableTimeSpanOperationFilterInput
+  dateOfLastUpadte: ComparableDateTimeOperationFilterInput
+  timeOfLastUpdate: ComparableTimeSpanOperationFilterInput
+  reviewer: SafiriCarUserFilterInput
+}
+
+input FrequentRouteFilterInput {
+  and: [FrequentRouteFilterInput!]
+  or: [FrequentRouteFilterInput!]
+  origin: StringOperationFilterInput
+  destination: StringOperationFilterInput
+  image: StringOperationFilterInput
+  color: ColorCustomFilterInput
+  userId: StringOperationFilterInput
+  createdDate: ComparableNullableOfDateTimeOperationFilterInput
+  id: ComparableInt32OperationFilterInput
+}
+
+input ComparableTimeSpanOperationFilterInput {
+  eq: TimeSpan
+  neq: TimeSpan
+  in: [TimeSpan!]
+  nin: [TimeSpan!]
+  gt: TimeSpan
+  ngt: TimeSpan
+  gte: TimeSpan
+  ngte: TimeSpan
+  lt: TimeSpan
+  nlt: TimeSpan
+  lte: TimeSpan
+  nlte: TimeSpan
+}
+
+input ColorCustomFilterInput {
+  and: [ColorCustomFilterInput!]
+  or: [ColorCustomFilterInput!]
+  r: StringOperationFilterInput
+  g: StringOperationFilterInput
+  b: StringOperationFilterInput
+  a: StringOperationFilterInput
+  id: ComparableInt32OperationFilterInput
+}
+
+type AuthorizeDirective {
+  policy: String
+  roles: [String!]
+  apply: ApplyPolicy!
+}
+
+type APIRequest {
+  id: String
+  iPAddress: String
+  uAString: String
+  languages: String
+  path: String
+  statusCode: Int!
+  createdOn: DateTime!
+}
+
+type AppResultOfListOfContactUs implements IResult {
+  data: [ContactUs!]!
+  messages: [String!]!
+  succeeded: Boolean!
+}
+
+type AppResultOfUserRolesResponse implements IResult {
+  data: UserRolesResponse!
+  messages: [String!]!
+  succeeded: Boolean!
+}
+
+input CreateRideRequestInput {
+  name: String!
+  placeofStart: String!
+  destination: String!
+  isActive: Boolean
+  departureDate: String!
+  duration: String!
+  estimatePrice: Float!
+  estimateDistance: String!
+  numberOfPeople: Int!
+  maximumCarryWeight: Int!
+  carId: String!
+  seat: SeatInput!
+  departureTime: String!
+  allowedBehDesc: String
+  rideIndex: Int
+  exactPickupLocation: String
+  exactDropOffLocation: String
+  isRecurring: Boolean
+}
+
+input ContactUsRequestInput {
+  name: String!
+  email: String!
+  message: String!
+}
+
+input ToggleUserStatusRequestInput {
+  activateUser: Boolean!
+  userId: String!
+}
+
+input UpdateIdentificationDocumentRequestInput {
+  email: String!
+  identificationDocument: IdentificationDocumentInput
+  updatedBy: String
+}
+
+input UpdateRequestInput {
+  firstName: String
+  lastName: String
+  email: String!
+  userName: String
+  aboutMe: String
+  phoneNumber: String
+  updatedBy: String
+}
+
+input RegisterRequestInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  nationalId: String!
+  userName: String!
+  password: String!
+  confirmPassword: String!
+  phoneNumber: String!
+  role: String!
+  activateUser: Boolean!
+  autoConfirmEmail: Boolean!
+  createdBy: String!
+  identificationDocument: IdentificationDocumentInput
+  totalRating: Int!
+  averageRating: Float!
+  referalCode: String
+  locationDto: LocationDtoInput!
+  deviceDto: DeviceDtoInput
+}
+
+input ResetPasswordRequestInput {
+  email: String!
+  password: String!
+  confirmPassword: String!
+  token: String!
+}
+
+input ForgotPasswordRequestInput {
+  email: String!
+}
+
+input UpdateUserRolesRequestInput {
+  userId: String!
+  userRoles: [UserRoleModelInput!]!
+}
+
+type AppResult implements IResult {
+  messages: [String!]!
+  succeeded: Boolean!
+}
+
+input RoleClaimRequestInput {
+  id: Int!
+  roleId: String!
+  type: String!
+  value: String!
+  description: String!
+  group: String!
+  selected: Boolean!
+}
+
+input PermissionRequestInput {
+  roleId: String!
+  roleClaims: [RoleClaimRequestInput!]!
+}
+
+input RoleRequestInput {
+  id: String!
+  name: String!
+  description: String!
+}
+
+type AppResultOfString implements IResult {
+  data: String!
+  messages: [String!]!
+  succeeded: Boolean!
+}
+
+type AppResultOfPermissionResponse implements IResult {
+  data: PermissionResponse!
+  messages: [String!]!
+  succeeded: Boolean!
+}
+
+type AppResultOfRoleResponse implements IResult {
+  data: RoleResponse!
+  messages: [String!]!
+  succeeded: Boolean!
+}
+
+type AppResultOfListOfRoleResponse implements IResult {
+  data: [RoleResponse!]!
+  messages: [String!]!
+  succeeded: Boolean!
+}
+
+type AppResultOfRoleClaimResponse implements IResult {
+  data: RoleClaimResponse!
+  messages: [String!]!
+  succeeded: Boolean!
+}
+
+type AppResultOfListOfRoleClaimResponse implements IResult {
+  data: [RoleClaimResponse!]!
+  messages: [String!]!
+  succeeded: Boolean!
+}
+
+input FrequentRouteInput {
+  origin: String!
+  destination: String!
+  image: String!
+  color: ColorCustomInput!
+  userId: String!
+  createdDate: DateTime
+  id: Int!
+}
+
+type AppResultOfBoolean implements IResult {
+  data: Boolean!
+  messages: [String!]!
+  succeeded: Boolean!
+}
+
+input ResfreshTokenRequestInput {
+  token: String!
+  refreshToken: String!
+}
+
+input TokenRequestInput {
+  email: String!
+  password: String!
+}
+
+type AppResultOfTokenResponse implements IResult {
+  data: TokenResponse!
+  messages: [String!]!
+  succeeded: Boolean!
+}
+
+input UpdateProfileRequestInput {
+  phoneNumber: String
+  firstName: String!
+  lastName: String!
+  email: String!
+  identificationDocumentUrl: String!
+}
+
+input PasswordResetRequestByPhoneInput {
+  password: String!
+  confirmPassword: String!
+  phoneNumber: String!
+}
+
+input ChangePasswordRequestInput {
+  password: String!
+  newPassword: String!
+  phoneNumber: String!
+}
+
+interface IResult {
+  messages: [String!]!
+  succeeded: Boolean!
+}
+
+type LipaNaMpesaResponse {
+  merchantRequestID: String
+  checkoutRequestID: String
+  responseCode: String
+  responseDescription: String
+  customerMessage: String
+}
+
+input TransactRequestInput {
+  phoneNumber: String!
+  amount: String!
+  callBackUrl: String!
+}
+
+type LipaNaMpesaOnlineStatusResponse {
+  responseCode: String
+  responseDescription: String
+  merchantRequestID: String
+  checkoutRequestID: String
+  resultCode: String
+  resultDesc: String
+}
+
+type B2CResponse {
+  conversationID: String
+  originatorConversationID: String
+  responseCode: String
+  responseDescription: String
+}
+
+input TransactB2CRequestInput {
+  phoneNumber: String!
+  amount: String!
+  callBackUrl: String!
+  occassion: String!
+  remarks: String!
+  queueTimeOutURL: String!
+  rideId: Int!
+  userId: String
+}
+
+type TransactionStatusResponse {
+  conversationID: String
+  originatorConversationID: String
+  responseCode: String
+  responseDescription: String
+}
+
+input TransactionStatusRequestDtoInput {
+  transactionID: String!
+  resultURL: String
+  queueTimeOutURL: String
+  remarks: String
+  occasion: String
+}
+
+type ReverseResponse {
+  conversationID: String
+  originatorConversationID: String
+  responseCode: String
+  responseDescription: String
+}
+
+input ReverseRequestInput {
+  initiator: String
+  securityCredential: String
+  commandID: CommandType
+  transactionID: String
+  amount: String
+  receiverParty: String
+  recieverIdentifierType: String
+  remarks: String
+  queueTimeOutURL: String
+  resultURL: String
+  occassion: String
+}
+
+type RideTransaction {
+  id: String
+  phoneNumber: String
+  amount: Float!
+  isReversed: Boolean!
+  status: String
+  bookedRideId: Int!
+  passengerId: String
+  driverId: String
+  transactionCode: String
+  merchantRequestId: String
+  checkoutRequestId: String
+  transactionDate: DateTime
+  transactionTime: TimeSpan
+  approvedDateTime: DateTime!
+  transactionID: String
+  conversationID: String
+  originatorConversationID: String
+  reversedDate: String
+  reversedTime: String
+  reseaonForReversal: String
+  seatsStr: String
+  paymentMethod: String
+  exactDropOffLocation: String
+}
+
+type ChartDto {
+  id: String!
+  from: String!
+  to: String!
+  dateSend: String!
+  message: String!
+  topic: String!
+  deviceRegToken: String
+}
+
+input ChartDtoInput {
+  id: String!
+  from: String!
+  to: String!
+  dateSend: String!
+  message: String!
+  topic: String!
+  deviceRegToken: String
+}
+
+type PamrideMessage {
+  id: String
+  from: String
+  to: String
+  dateSend: DateTime
+  message: String
+  topic: String
+  updated: DateTime
+  updatedAt: TimeSpan
+}
+
+type SubscriberEmail {
+  id: Int
+  email: String
+  isActive: Boolean
+}
+
+input SubscriberEmailInput {
+  id: Int
+  email: String
+  isActive: Boolean
+}
+
+input UploadRequestInput {
+  fileName: String
+  extension: String
+  uploadType: UploadType
+  data: [Byte!]
+}
+
+input UploadRequestFlInput {
+  fileName: String
+  extension: String
+  uploadType: UploadType
+  data: String
+}
+
+type FileDownloadResponse {
+  fileName: String
+  fileType: String
+  data: [Byte!]
+}
+
+input DownloadRequestInput {
+  fileName: String
+  downloadType: UploadType
+}
+
+input CarInput {
+  id: String!
+  color: String!
+  model: String!
+  licensePlate: String!
+  imageUrl: String!
+  active: Boolean!
+  ownerId: String!
+  owner: SafiriCarUserInput
+  rides: [RideInput!]
+}
+
+input CarUpdateDtoInput {
+  color: String
+  model: String
+  licensePlate: String
+  imageUrl: String
+  active: Boolean!
+  ownerId: String
+}
+
+type Country {
+  id: Int!
+  name: String!
+  code: String!
+  abbrev: String!
+}
+
+"""
+The `TimeSpan` scalar represents an ISO-8601 compliant duration type.
+"""
+scalar TimeSpan
+
+type ColorCustom {
+  r: String!
+  g: String!
+  b: String!
+  a: String!
+  id: Int!
+}
+
+type Seat {
+  id: String
+  frontLeft: String
+  middleLeft: String
+  middleCentre: String
+  middleRight: String
+  backLeft: String
+  backCentre: String
+  backRight: String
+}
+
+"""
+The built-in `Decimal` scalar type.
+"""
+scalar Decimal
+
+input RideInput {
+  id: Int!
+  name: String
+  placeofStart: String
+  destination: String
+  driverId: String
+  estimatePrice: Float!
+  estimatedDistance: String
+  numberOfPeople: Int!
+  maximumCarryWeight: Int!
+  departureDate: DateTime!
+  duration: String
+  status: String
+  seat: SeatInput
+  seatCount: Int!
+  seatCapacity: Int!
+  maxTotalPay: Float!
+  totalPay: Float!
+  amountCashedOut: Decimal!
+  departureTime: TimeSpan
+  arrivalTime: DateTime!
+  allowedBehDesc: String
+  exactPickupLocation: String
+  routeIndex: Int
+  mpesaReceiptNumber: String!
+  transactionDate: DateTime!
+  merchantRequestId: String!
+  checkoutRequestId: String!
+  compensatedFromPassengerCancel: Float!
+  driverPaymentTime: DateTime
+  exactDropOffLocation: String
+  isRecurring: Boolean
+  carId: String!
+  car: CarInput
+  users: [UserRidesInput!]
+  transactions: [RideTransactionInput!]
+}
+
+input SafiriCarUserInput {
+  firstName: String!
+  lastName: String!
+  nationalId: String!
+  ownedCars: [CarInput!]!
+  createdBy: String!
+  profilePictureDataUrl: String!
+  referalCode: String
+  identificationDocument: IdentificationDocumentInput
+  createdOn: DateTime
+  lastModifiedBy: String
+  lastModifiedOn: DateTime
+  isDeleted: Boolean!
+  deletedOn: DateTime
+  isActive: Boolean!
+  refreshToken: String
+  role: String
+  refreshTokenExpiryTime: DateTime
+  totalRating: Int!
+  averageRating: Float!
+  tripsCreated: Int!
+  tripsCompleted: Int!
+  tripsCancelled: Int!
+  isVerified: Boolean!
+  aboutMe: String
+  loyaltyPoints: Float!
+  location: LocationInput
+  device: DeviceInput
+  rides: [UserRidesInput!]!
+  userRatings: [UserRatingInput!]!
+  frequentRoutes: [FrequentRouteInput!]!
+  userReferals: [SafiriCarUserInput!]
+  id: String
+  userName: String
+  normalizedUserName: String
+  email: String
+  normalizedEmail: String
+  emailConfirmed: Boolean!
+  passwordHash: String
+  securityStamp: String
+  concurrencyStamp: String
+  phoneNumber: String
+  phoneNumberConfirmed: Boolean!
+  twoFactorEnabled: Boolean!
+  lockoutEnd: DateTime
+  lockoutEnabled: Boolean!
+  accessFailedCount: Int!
+}
+
+"""
+The `Byte` scalar type represents non-fractional whole numeric values. Byte can represent values between 0 and 255.
+"""
+scalar Byte
+
+enum UploadType {
+  CAR
+  PROFILE_PICTURE
+  DOCUMENT
+}
+
+enum CommandType {
+  TRANSACTION_REVERSAL
+  SALARY_PAYMENT
+  BUSINESS_PAYMENT
+  PROMOTION_PAYMENT
+  ACCOUNT_BALANCE
+  CUSTOMER_PAY_BILL_ONLINE
+  TRANSACTION_STATUS_QUERY
+  CHECK_IDENTITY
+  BUSINESS_PAY_BILL
+  BUSINESS_BUY_GOODS
+  DISBURSE_FUNDS_TO_BUSINESS
+  BUSINESS_TO_BUSINESS_TRANSFER
+  BUSINESS_TRANSFER_FROM_MMFTO_UTILITY
+}
+
+input ColorCustomInput {
+  r: String!
+  g: String!
+  b: String!
+  a: String!
+  id: Int!
+}
+
+type RoleResponse {
+  id: String!
+  name: String!
+  description: String!
+}
+
+type PermissionResponse {
+  roleId: String!
+  roleName: String!
+  roleClaims: [RoleClaimResponse!]!
+}
+
+input UserRoleModelInput {
+  roleName: String!
+  roleDescription: String!
+  selected: Boolean!
+}
+
+input DeviceDtoInput {
+  deviceRegToken: String!
+}
+
+input LocationDtoInput {
+  town: String!
+  countryDto: CountryDtoInput!
+}
+
+input IdentificationDocumentInput {
+  id: Int!
+  nationalIdFront: String
+  nationalIdRear: String
+  drivingLicenceFront: String
+  drivingLicenceRear: String
+}
+
+input SeatInput {
+  id: String
+  frontLeft: String
+  middleLeft: String
+  middleCentre: String
+  middleRight: String
+  backLeft: String
+  backCentre: String
+  backRight: String
+}
+
+type ContactUs {
+  id: Int!
+  name: String!
+  email: String!
+  message: String!
+}
+
+enum ApplyPolicy {
+  BEFORE_RESOLVER
+  AFTER_RESOLVER
+}
+
+input CountryDtoInput {
+  name: String!
+  code: String!
+  abbrev: String!
+}
+
+input UserRatingInput {
+  id: Int!
+  userThatRate: String
+  userToRate: String
+  ratingValue: Float!
+  rideId: Int!
+  levelOfSatisfaction: String
+  comment: String
+  dateOfRating: DateTime!
+  timeOfRating: TimeSpan!
+  dateOfLastUpadte: DateTime!
+  timeOfLastUpdate: TimeSpan!
+  reviewer: SafiriCarUserInput!
+}
+
+input DeviceInput {
+  id: Int!
+  deviceRegToken: String!
+  createdOn: DateTime
+  createdBy: String
+  lastModifiedOn: DateTime
+  lastModifiedBy: String
+}
+
+input LocationInput {
+  id: Int!
+  town: String!
+  isPopular: Boolean!
+  country: CountryInput!
+  createdOn: DateTime
+  createdBy: String
+  lastModifiedOn: DateTime
+  lastModifiedBy: String
+}
+
+input RideTransactionInput {
+  id: String
+  phoneNumber: String
+  amount: Float!
+  isReversed: Boolean!
+  status: String
+  bookedRideId: Int!
+  passengerId: String
+  driverId: String
+  transactionCode: String
+  merchantRequestId: String
+  checkoutRequestId: String
+  transactionDate: DateTime
+  transactionTime: TimeSpan
+  approvedDateTime: DateTime!
+  transactionID: String
+  conversationID: String
+  originatorConversationID: String
+  reversedDate: String
+  reversedTime: String
+  reseaonForReversal: String
+  seatsStr: String
+  paymentMethod: String
+  exactDropOffLocation: String
+}
+
+input UserRidesInput {
+  userId: String
+  user: SafiriCarUserInput
+  rideId: Int!
+  ride: RideInput
+  transactions: [RideTransactionInput!]
+}
+
+input CountryInput {
+  id: Int!
+  name: String!
+  code: String!
+  abbrev: String!
+}

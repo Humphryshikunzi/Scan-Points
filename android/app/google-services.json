@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "686734316506",
+    "project_id": "pamride",
+    "storage_bucket": "pamride.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:686734316506:android:6d125097175dedef6aa6e3",
+        "android_client_info": {
+          "package_name": "com.mobile.pamride"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "686734316506-8sbon31pubte16o3n4m8en4k33u3kif1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCP9yZQuI0eV0uamoRuhA47xa3qTQfVhcI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "686734316506-8sbon31pubte16o3n4m8en4k33u3kif1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:686734316506:android:852c213fe52f610e6aa6e3",
+        "android_client_info": {
+          "package_name": "com.mobile.pointscan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "686734316506-8sbon31pubte16o3n4m8en4k33u3kif1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCP9yZQuI0eV0uamoRuhA47xa3qTQfVhcI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "686734316506-8sbon31pubte16o3n4m8en4k33u3kif1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

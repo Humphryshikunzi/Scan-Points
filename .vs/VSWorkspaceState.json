@@ -1,0 +1,11 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\dotnet",
+    "\\dotnet\\safiricar.Api",
+    "\\dotnet\\safiricar.Persistent",
+    "\\dotnet\\safiricar.Persistent\\Data"
+  ],
+  "SelectedNode": "\\dotnet\\safiricar.Persistent\\Data\\AppDbContext.cs",
+  "PreviewInSolutionExplorer": false
+}
