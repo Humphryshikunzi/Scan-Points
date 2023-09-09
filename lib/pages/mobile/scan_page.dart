@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:pamride/helpers/ColorsRes.dart';
+import 'package:pamride/helpers/GrobagColor.dart';
+import 'package:pamride/helpers/Language_Constants.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class QRScannerScreen extends StatefulWidget {
@@ -81,10 +83,8 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
         length: 2,
         child: Scaffold(
           extendBody: true,
-          backgroundColor: ColorsRes.backgroundColor,
           appBar: AppBar(
             automaticallyImplyLeading: false,
-            backgroundColor: ColorsRes.backgroundColor,
             title: Row(
               children: [
                 Column(
@@ -94,8 +94,10 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                     Row(
                       children: [
                         Text(
-                          'Scan QR/Bar Code',
-                          style: TextStyle(fontSize: 20, color: Colors.black),
+                          translation(context).scan,
+                          style: TextStyle(
+                            fontSize: 20,
+                          ),
                         ),
                       ],
                     ),
@@ -104,16 +106,17 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
               ],
             ),
           ),
+          backgroundColor: white,
           body: Container(
             margin: EdgeInsets.all(10),
             child: Column(
               children: [
                 if (!isScanning)
-                  Container( 
+                  Container(
                     alignment: Alignment.center,
                     child: Text(
                       'Scanned Code: $scannedCode',
-                      style: TextStyle(color: Colors.black, fontSize: 20),
+                      style: TextStyle(fontSize: 20),
                     ),
                   ),
                 SizedBox(
@@ -126,7 +129,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                     onQRViewCreated: _onQRViewCreated,
                     overlay: isScanning
                         ? QrScannerOverlayShape(
-                            borderColor: Colors.orange,
+                            borderColor: ColorsRes.secondaryColor,
                             borderRadius: 10,
                             borderLength: 30,
                             borderWidth: 10,

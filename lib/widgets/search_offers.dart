@@ -2,7 +2,11 @@ import 'package:algolia_helper_flutter/algolia_helper_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:pamride/helpers/ColorsRes.dart';
 import 'package:pamride/helpers/Constant.dart';
+import 'package:pamride/helpers/Language.dart';
+import 'package:pamride/helpers/Language_Constants.dart';
+import 'package:pamride/main.dart';
 import 'package:pamride/pages/mobile/search_result_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pamride/widgets/images.dart';
@@ -55,15 +59,15 @@ class HitsPage {
   }
 }
 
-class SearchRidesPage extends StatefulWidget {
+class SearchOffers extends StatefulWidget {
   final String? title;
-  const SearchRidesPage({Key? key, this.title}) : super(key: key);
+  const SearchOffers({Key? key, this.title}) : super(key: key);
 
   @override
-  State<SearchRidesPage> createState() => _SearchRidesPageState();
+  State<SearchOffers> createState() => _SearchRidesPageState();
 }
 
-class _SearchRidesPageState extends State<SearchRidesPage> {
+class _SearchRidesPageState extends State<SearchOffers> {
   final _searchTextController = TextEditingController();
 
   final _ridessSearcher = HitsSearcher(
@@ -147,11 +151,49 @@ class _SearchRidesPageState extends State<SearchRidesPage> {
       key: _mainScaffoldKey,
       extendBody: true,
       appBar: AppBar(
-        title: const Text(
-          'Search for a ride',
-          style: TextStyle(color: Colors.black),
+        title: Text(
+          translation(context).search,
+          style: TextStyle(),
         ),
-        backgroundColor: Colors.white,
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).size.height * 0.015,
+              bottom: MediaQuery.of(context).size.height * 0.01,
+              left: MediaQuery.of(context).size.height * 0.28,
+              right: MediaQuery.of(context).size.height * 0.01,
+            ),
+            child: DropdownButton<Language>(
+              underline: const SizedBox(),
+              icon: const Icon(
+                Icons.more_vert,
+              ),
+              onChanged: (Language? language) async {
+                if (language != null) {
+                  Locale _locale = await setLocale(language.languageCode);
+                  MyApp.setLocale(context, _locale);
+                }
+              },
+              items: Language.languageList()
+                  .map<DropdownMenuItem<Language>>(
+                    (e) => DropdownMenuItem<Language>(
+                      value: e,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: <Widget>[
+                          Text(
+                            e.flag,
+                            style: const TextStyle(fontSize: 30),
+                          ),
+                          Text(e.name)
+                        ],
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+        ],
       ),
       body: Center(
           child: Stack(
@@ -179,7 +221,7 @@ class _SearchRidesPageState extends State<SearchRidesPage> {
                               BorderRadius.circular(20.0), // Rounded border
                           borderSide: BorderSide.none,
                         ),
-                        hintText: 'Enter place of start or destination',
+                        hintText: translation(context).searchOffers,
                         prefixIcon: Padding(
                           padding: EdgeInsets.only(left: 8.0, right: 8.0),
                           child: Icon(Icons.search, color: Colors.orange),
@@ -232,7 +274,7 @@ class _SearchRidesPageState extends State<SearchRidesPage> {
                     );
                   },
                 ),
-                Expanded(child: _hits(context)),
+                //Expanded(child: _hits(context)),
               ],
             ),
           )
@@ -249,8 +291,8 @@ class _SearchRidesPageState extends State<SearchRidesPage> {
               ),
           itemBuilder: (_, item, __) => Container(
               color: _searchTextController.text.length > 0
-                  ? Colors.white
-                  : Colors.transparent,
+                  ? ColorsRes.secondaryColor
+                  : ColorsRes.darkOrangeColor,
               height: (item.placeOfStart.length + item.destination.length > 45)
                   ? 90
                   : 70,
@@ -308,15 +350,13 @@ class _SearchRidesPageState extends State<SearchRidesPage> {
                                   // Driver Name
                                   TextSpan(
                                     text: 'driver: ',
-                                    style: TextStyle(
-                                      color: Colors.black,
+                                    style: TextStyle( 
                                       fontWeight: FontWeight.normal,
                                     ),
                                   ),
                                   TextSpan(
                                     text: '${item.driverName},\t\t',
-                                    style: TextStyle(
-                                      color: Colors.black54,
+                                    style: TextStyle( 
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -324,15 +364,13 @@ class _SearchRidesPageState extends State<SearchRidesPage> {
                                   // Price
                                   TextSpan(
                                     text: 'price: ',
-                                    style: TextStyle(
-                                      color: Colors.black,
+                                    style: TextStyle( 
                                       fontWeight: FontWeight.normal,
                                     ),
                                   ),
                                   TextSpan(
                                     text: 'Ksh ${item.price}\n',
-                                    style: TextStyle(
-                                      color: Colors.black54,
+                                    style: TextStyle( 
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -340,15 +378,13 @@ class _SearchRidesPageState extends State<SearchRidesPage> {
                                   // Departure Date
                                   TextSpan(
                                     text: 'departure: ',
-                                    style: TextStyle(
-                                      color: Colors.black,
+                                    style: TextStyle( 
                                       fontWeight: FontWeight.normal,
                                     ),
                                   ),
                                   TextSpan(
                                     text: '${item.departureDate}',
-                                    style: TextStyle(
-                                      color: Colors.black54,
+                                    style: TextStyle( 
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),

@@ -5,11 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pamride/controllers/account_controller.dart';
 import 'package:pamride/controllers/client_controller.dart';
+import 'package:pamride/helpers/ColorsRes.dart';
 import 'package:pamride/pages/mobile/landing_page.dart';
-import 'package:pamride/pages/mobile/profile_page.dart';
+import 'package:pamride/pages/mobile/profile_page.dart'; 
+import 'package:pamride/widgets/search_offers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'scan_page.dart';
 import 'message_page.dart';
+import 'package:pamride/helpers/Language_Constants.dart';
 
 class HomePage extends StatefulWidget {
   final bool resetIndex;
@@ -27,6 +30,7 @@ class _HomePageState extends State<HomePage> {
   int tabValue = 0;
   List<Widget> passengerPages = [
     LandingPage(),
+    SearchOffers(),
     QRScannerScreen(),
     MessageActivity(),
     ProfilePage(),
@@ -81,37 +85,37 @@ class _HomePageState extends State<HomePage> {
     return kIsWeb
         ? SizedBox.shrink()
         : CupertinoTabBar(
-            activeColor: Colors.deepOrange,
+            activeColor: ColorsRes.secondaryColor,
             items: <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                 icon: Icon(
                   CupertinoIcons.home,
                 ),
-                label: 'Home',
+                label: translation(context).home,
               ),
               BottomNavigationBarItem(
-                icon: Icon(
-                  CupertinoIcons.search,
+                icon: ImageIcon(
+                  AssetImage('assets/images/logo.png'),
                 ),
-                label: 'Search',
+                label: translation(context).search,
               ),
               BottomNavigationBarItem(
                 icon: Icon(
                   CupertinoIcons.square_list,
                 ),
-                label: 'Scan',
+                label: translation(context).scan,
               ),
               BottomNavigationBarItem(
                 icon: Icon(
                   CupertinoIcons.shopping_cart,
                 ),
-                label: 'Stores',
+                label: translation(context).stores,
               ),
               BottomNavigationBarItem(
                 icon: Icon(
                   CupertinoIcons.profile_circled,
                 ),
-                label: 'My Account',
+                label: translation(context).myAccount,
               ),
             ],
             currentIndex: tabValue,

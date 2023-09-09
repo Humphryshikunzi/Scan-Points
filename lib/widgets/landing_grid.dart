@@ -8,8 +8,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pamride/controllers/account_controller.dart';
 import 'package:pamride/controllers/client_controller.dart';
-import 'package:pamride/pages/mobile/ride_details.dart';
-import 'package:pamride/widgets/format_date_time.dart';
 import 'package:pamride/widgets/ride_utlities.dart';
 import 'package:pamride/widgets/rides_paginate.dart';
 import 'package:provider/provider.dart';
@@ -95,7 +93,8 @@ class _LandingGridState extends State<LandingGrid> {
                   List<GGetRidesData_rides> rides = [];
                   ridesList.forEach((p0) {
                     DateTime currentDateTime = DateTime.now().toUtc();
-                    int depTimeDiff = DateTime.parse(p0.departureDate.value).toLocal()
+                    int depTimeDiff = DateTime.parse(p0.departureDate.value)
+                        .toLocal()
                         .difference(currentDateTime)
                         .inMinutes;
                     if (depTimeDiff > 0) {
@@ -239,12 +238,6 @@ class _LandingGridState extends State<LandingGrid> {
       onTap: () {
         _accountController.rideId = rideId.obs;
         _accountController.cartAmount = price.obs;
-        Get.to(
-          () => RideDetail(
-            ride: ride,
-            departureDate: DateTime.parse(ride.departureDate.value.toString()).toLocal(),
-          ),
-        );
       },
       child: Stack(
         children: [

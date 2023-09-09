@@ -3,11 +3,9 @@ import 'package:get/get.dart';
 import 'package:pamride/components/ride_details.dart';
 import 'package:pamride/components/sorting_details.dart';
 import 'package:pamride/components/tabs.dart';
-import 'package:pamride/components/tickets.dart';
 import 'package:pamride/controllers/reponsiveness.dart';
 import 'package:pamride/helpers/ColorsRes.dart';
-import 'package:pamride/helpers/GrobagColor.dart';
-import '../../components/grid_tickets.dart';
+import 'package:pamride/helpers/GrobagColor.dart'; 
 
 class ResultPage extends StatefulWidget {
   /// modfication of the constructor to rececive a value (Location Clicked) from the Landing page
@@ -133,12 +131,6 @@ class _ResultPageState extends State<ResultPage> {
                   child: Column(
                     children: <Widget>[
                       SizedBox(height: 5.0),
-
-                      /// The Tickets() constructor takes a paramater of the location tapped and passes it to the Tickets page to be used in displaying the required rides
-                      Tickets(
-                          originToCompare: widget.originToCompare,
-                          destinationToCompare: widget.destinationToCompare,
-                          sortByPrice: sortByPrice),
                     ],
                   ),
                 )
@@ -164,8 +156,7 @@ class _ResultPageState extends State<ResultPage> {
                       SortingDetails(),
                       SizedBox(height: 15.0),
                       MyTabs(),
-                      SizedBox(height: 10.0),
-                      GridTickets()
+                      SizedBox(height: 10.0), 
                     ],
                   ),
                 )

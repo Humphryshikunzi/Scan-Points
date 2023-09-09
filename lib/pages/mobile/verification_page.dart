@@ -11,7 +11,6 @@ import 'package:pamride/helpers/ColorsRes.dart';
 import 'package:pamride/helpers/DesignConfig.dart';
 import 'package:pamride/helpers/htttp_helper.dart';
 import 'package:pamride/pages/mobile/add_profile_page.dart';
-import 'package:pamride/pages/mobile/driver_home.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../graphql/__generated__/operations.req.gql.dart';
@@ -451,11 +450,9 @@ class _VerificationPageState extends State<VerificationPage> {
     _clientController.client.request(updateUserDocReq).listen((event) {
       if (event.data!.updateUserDocuments.succeeded) {
         SVProgressHUD.dismiss();
-        widget.verifyLater == true
-            ? Get.off(() => PostRidePage())
-            : Get.to(AddProfilePage(
-                isDriver: true,
-              ));
+        Get.to(AddProfilePage(
+          isDriver: true,
+        ));
       } else {
         SVProgressHUD.dismiss();
       }

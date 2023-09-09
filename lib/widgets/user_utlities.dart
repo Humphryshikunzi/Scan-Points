@@ -9,6 +9,7 @@ import 'package:pamride/controllers/account_controller.dart';
 import 'package:pamride/helpers/ColorsRes.dart';
 import 'package:pamride/helpers/Constant.dart';
 import 'package:pamride/helpers/GrobagColor.dart';
+import 'package:pamride/helpers/Language_Constants.dart';
 import 'package:pamride/helpers/graphql_helper.dart';
 import 'package:pamride/helpers/htttp_helper.dart';
 import 'package:pamride/pages/mobile/login_page.dart';
@@ -28,10 +29,10 @@ List<Map<String, String>> Countries = [
 ];
 
 List<Map<String, String>> Clubs = [
-  {'name': 'Al-Hilal', 'abbrev': 'HIL', 'league': "1"},
-  {'name': 'Al-Nassr', 'abbrev': 'NAS', 'league': "1"},
-  {'name': 'Al-Ittihad', 'abbrev': 'ITT', 'league': "1"},
-  {'name': 'Al-Ahli', 'abbrev': 'AHL', "league": "1"},
+  {'name': 'Al-Hilal', 'sname': 'الهلال', 'abbrev': 'HIL', 'league': "1"},
+  {'name': 'Al-Nassr', 'sname': 'النصر', 'abbrev': 'NAS', 'league': "1"},
+  {'name': 'Al-Ittihad', 'sname': 'الاتحاد', 'abbrev': 'ITT', 'league': "1"},
+  {'name': 'Al-Ahli', 'sname': 'الأهلي', 'abbrev': 'AHL', "league": "1"},
 ];
 
 dynamic Towns = [
@@ -333,7 +334,7 @@ logOut(AccountController accountController, BuildContext context) {
     child: Row(
       children: [
         Text(
-          'Logout',
+          translation(context).logOut,
           style: TextStyle(
             fontSize: 15,
             color: Colors.red,

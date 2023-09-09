@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:pamride/helpers/ButtonClickAnimation.dart';
 import 'package:pamride/helpers/ColorsRes.dart';
 import 'package:pamride/helpers/DesignConfig.dart';
+import 'package:pamride/helpers/Language_Constants.dart';
 import 'package:pamride/helpers/StringsRes.dart';
 import 'package:pamride/pages/mobile/home_page.dart';
 import 'package:pamride/widgets/user_utlities.dart';
@@ -53,6 +54,16 @@ class _SignupActivityState extends State<SignupActivity>
 
   @override
   Widget build(BuildContext context) {
+    Color inputBackgroundColor =
+        Theme.of(context).brightness == Brightness.light
+            ? Colors.white // Light mode background color
+            : Colors.black; // Dark mode background color
+
+    Color borderColor = Theme.of(context).brightness == Brightness.light
+        ? ColorsRes.secondaryColor // Light mode background color
+        : ColorsRes.grayColor; // Dark mode background color
+
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return DefaultTabController(
       length: 2,
       child: Container(
@@ -66,7 +77,6 @@ class _SignupActivityState extends State<SignupActivity>
         child: Scaffold(
             key: scaffoldKey,
             extendBody: true,
-            backgroundColor: Colors.black,
             body: SizedBox(
               height: MediaQuery.of(context).size.height,
               child: Stack(
@@ -75,9 +85,10 @@ class _SignupActivityState extends State<SignupActivity>
                     children: [
                       Padding(
                         padding: EdgeInsets.only(
-                            top: MediaQuery.of(context).padding.top + 15,
-                            left: 15,
-                            right: 15),
+                          top: MediaQuery.of(context).padding.top + 15,
+                          left: 15,
+                          right: 15,
+                        ),
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: GestureDetector(
@@ -85,45 +96,42 @@ class _SignupActivityState extends State<SignupActivity>
                               Navigator.of(context).pop();
                             },
                             child: Card(
-                              shape: DesignConfig.setRoundedBorder(
-                                  ColorsRes.white, 8, false),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    8.0), // Set the border radius
+                              ),
+                              elevation:
+                                  2, // Adjust the elevation for the card shadow
+                              color: Theme.of(context)
+                                  .canvasColor, // Use the theme's card color
                               child: Padding(
-                                padding: const EdgeInsets.all(5),
+                                padding: const EdgeInsets.all(
+                                    8), // Adjust padding as needed
                                 child: Icon(
                                   Icons.keyboard_arrow_left,
-                                  color: ColorsRes.black,
+                                  color: Theme.of(context)
+                                      .iconTheme
+                                      .color, // Use the theme's icon color
                                 ),
                               ),
                             ),
                           ),
                         ),
                       ),
+
                       Expanded(
                         flex: 1,
                         child: Align(
                           alignment: Alignment.topCenter,
                           child: Image.asset(
-                            "assets/images/logo.png",
+                            isDarkMode
+                                ? "assets/images/logo.png"
+                                : "assets/images/logo_light.jpeg",
                             width: MediaQuery.of(context).size.width * 0.5,
                           ),
                         ),
                       ),
 
-                      /// sign up text
-                      Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Entema',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineMedium!
-                              .merge(TextStyle(
-                                  color: ColorsRes.white,
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold)),
-                        ),
-                      ),
-
                       SizedBox(
                         height: 5,
                       ),
@@ -132,14 +140,12 @@ class _SignupActivityState extends State<SignupActivity>
                       Align(
                         alignment: Alignment.center,
                         child: Text(
-                          'انتماء',
+                          translation(context).appName,
                           style: Theme.of(context)
                               .textTheme
                               .headlineMedium!
                               .merge(TextStyle(
-                                  color: ColorsRes.white,
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold)),
+                                  fontSize: 25, fontWeight: FontWeight.bold)),
                         ),
                       ),
                       SizedBox(
@@ -150,7 +156,7 @@ class _SignupActivityState extends State<SignupActivity>
                       Align(
                         alignment: Alignment.center,
                         child: Text(
-                          'Sign up',
+                          translation(context).signUp,
                           style: Theme.of(context)
                               .textTheme
                               .headlineSmall!
@@ -168,19 +174,13 @@ class _SignupActivityState extends State<SignupActivity>
                       Align(
                         alignment: Alignment.center,
                         child: Text(
-                          'Hello, please sign up to continue',
-                          style: Theme.of(context)
-                              .textTheme
-                              .displaySmall!
-                              .merge(TextStyle(
-                                  color: ColorsRes.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold)),
+                          translation(context).pleaseSignUp,
+                          style: Theme.of(context).textTheme.titleLarge!.merge(
+                              TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
                         ),
                       ),
-                      SizedBox(
-                        height: 5,
-                      ),
+
                       Expanded(
                         flex: 6,
                         child: Align(
@@ -203,27 +203,30 @@ class _SignupActivityState extends State<SignupActivity>
                                   Align(
                                     alignment: Alignment.centerLeft,
                                     child: Text(
-                                      'Username',
+                                      translation(context).usernameHint,
                                       style: TextStyle(
                                           fontSize: 16,
-                                          color: ColorsRes.black,
                                           fontWeight: FontWeight.normal),
                                     ),
                                   ),
 
-                                  /// username textfield
                                   Container(
                                     height: MediaQuery.of(context).size.height *
                                         0.06,
                                     width:
                                         MediaQuery.of(context).size.width * 0.9,
-                                    decoration: DesignConfig
-                                        .boxDecorationContainerShadow(
-                                            ColorsRes.containerShadowColor,
-                                            10,
-                                            10,
-                                            10,
-                                            10),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          inputBackgroundColor, // Use the determined color here
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: borderColor,
+                                          blurRadius: 3,
+                                          spreadRadius: 1,
+                                        ),
+                                      ],
+                                    ),
                                     margin: EdgeInsets.only(top: 2),
                                     padding: EdgeInsets.only(left: 10),
                                     child: TextFormField(
@@ -231,12 +234,13 @@ class _SignupActivityState extends State<SignupActivity>
                                           color: ColorsRes.black, fontSize: 16),
                                       cursorColor: ColorsRes.black,
                                       decoration: InputDecoration(
-                                        hintText: 'Enter a unique username',
+                                        hintText: translation(context).username,
                                         hintStyle: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.normal,
-                                            color: ColorsRes.grayColor
-                                                .withOpacity(0.5)),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.normal,
+                                          color: ColorsRes.grayColor
+                                              .withOpacity(0.5),
+                                        ),
                                         border: InputBorder.none,
                                       ),
                                       keyboardType: TextInputType.name,
@@ -249,10 +253,9 @@ class _SignupActivityState extends State<SignupActivity>
                                   Align(
                                     alignment: Alignment.centerLeft,
                                     child: Text(
-                                      StringsRes.lblemail,
+                                      translation(context).email,
                                       style: TextStyle(
                                           fontSize: 16,
-                                          color: ColorsRes.black,
                                           fontWeight: FontWeight.normal),
                                     ),
                                   ),
@@ -263,13 +266,18 @@ class _SignupActivityState extends State<SignupActivity>
                                         0.06,
                                     width:
                                         MediaQuery.of(context).size.width * 0.9,
-                                    decoration: DesignConfig
-                                        .boxDecorationContainerShadow(
-                                            ColorsRes.containerShadowColor,
-                                            10,
-                                            10,
-                                            10,
-                                            10),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          inputBackgroundColor, // Use the determined color here
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: borderColor,
+                                          blurRadius: 3,
+                                          spreadRadius: 1,
+                                        ),
+                                      ],
+                                    ),
                                     margin: EdgeInsets.only(top: 2),
                                     padding: EdgeInsets.only(left: 10),
                                     child: TextFormField(
@@ -277,12 +285,14 @@ class _SignupActivityState extends State<SignupActivity>
                                           color: ColorsRes.black, fontSize: 16),
                                       cursorColor: ColorsRes.black,
                                       decoration: InputDecoration(
-                                        hintText: StringsRes.youremail,
+                                        hintText:
+                                            translation(context).emailHint,
                                         hintStyle: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.normal,
-                                            color: ColorsRes.grayColor
-                                                .withOpacity(0.5)),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.normal,
+                                          color: ColorsRes.grayColor
+                                              .withOpacity(0.5),
+                                        ),
                                         border: InputBorder.none,
                                       ),
                                       keyboardType: TextInputType.emailAddress,
@@ -290,8 +300,6 @@ class _SignupActivityState extends State<SignupActivity>
                                     ),
                                   ),
                                   SizedBox(height: 10),
-
-                                  /// club and town/city container
                                   Container(
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
@@ -299,11 +307,11 @@ class _SignupActivityState extends State<SignupActivity>
                                         Align(
                                           alignment: Alignment.centerLeft,
                                           child: Text(
-                                            "Choose your  Club",
+                                            "Choose your Club",
                                             style: TextStyle(
-                                                fontSize: 16,
-                                                color: ColorsRes.black,
-                                                fontWeight: FontWeight.normal),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.normal,
+                                            ),
                                           ),
                                         ),
                                         Container(
@@ -315,36 +323,50 @@ class _SignupActivityState extends State<SignupActivity>
                                                   .size
                                                   .width *
                                               0.9,
-                                          decoration: DesignConfig
-                                              .boxDecorationContainerShadow(
-                                                  ColorsRes
-                                                      .containerShadowColor,
-                                                  10,
-                                                  10,
-                                                  10,
-                                                  10),
+                                          decoration: BoxDecoration(
+                                            color:
+                                                inputBackgroundColor, // Use the determined color here
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: borderColor,
+                                                blurRadius: 3,
+                                                spreadRadius: 1,
+                                              ),
+                                            ],
+                                          ),
                                           margin: EdgeInsets.only(top: 2),
                                           padding: EdgeInsets.only(left: 10),
                                           child: Container(
                                             height: 100,
                                             child: SingleChildScrollView(
-                                                child: DropdownButton(
-                                              value: edtClub,
-                                              onChanged: (newValue) {
-                                                setState(() {
-                                                  edtClub = newValue.toString();
-                                                });
-                                              },
-                                              items: Clubs.map<
-                                                      DropdownMenuItem<String>>(
+                                              child: DropdownButton(
+                                                value: edtClub,
+                                                onChanged: (newValue) {
+                                                  setState(() {
+                                                    edtClub =
+                                                        newValue.toString();
+                                                  });
+                                                },
+                                                items: Clubs.map<
+                                                    DropdownMenuItem<String>>(
                                                   (Map<String, String> club) {
-                                                return DropdownMenuItem<String>(
-                                                  value: club['name'],
-                                                  child: Text(
-                                                      club['name'].toString()),
-                                                );
-                                              }).toList(),
-                                            )),
+                                                    return DropdownMenuItem<
+                                                        String>(
+                                                      value: club['name'],
+                                                      child: Text(
+                                                        "(" +
+                                                            club['name']
+                                                                .toString() +
+                                                            ")" +
+                                                            club['sname']!,
+                                                      ),
+                                                    );
+                                                  },
+                                                ).toList(),
+                                              ),
+                                            ),
                                           ),
                                         )
                                       ],
@@ -356,27 +378,30 @@ class _SignupActivityState extends State<SignupActivity>
                                   Align(
                                     alignment: Alignment.centerLeft,
                                     child: Text(
-                                      StringsRes.password,
+                                      translation(context).passwordHint,
                                       style: TextStyle(
                                           fontSize: 18,
-                                          color: ColorsRes.black,
                                           fontWeight: FontWeight.normal),
                                     ),
                                   ),
 
-                                  /// password textfield
                                   Container(
                                     height: MediaQuery.of(context).size.height *
                                         0.06,
                                     width:
                                         MediaQuery.of(context).size.width * 0.9,
-                                    decoration: DesignConfig
-                                        .boxDecorationContainerShadow(
-                                            ColorsRes.containerShadowColor,
-                                            10,
-                                            10,
-                                            10,
-                                            10),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          inputBackgroundColor, // Use the determined color here
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: borderColor,
+                                          blurRadius: 3,
+                                          spreadRadius: 1,
+                                        ),
+                                      ],
+                                    ),
                                     margin: EdgeInsets.only(top: 2),
                                     padding: EdgeInsets.only(left: 10),
                                     child: TextFormField(
@@ -386,12 +411,14 @@ class _SignupActivityState extends State<SignupActivity>
                                           color: ColorsRes.black, fontSize: 16),
                                       cursorColor: ColorsRes.black,
                                       decoration: InputDecoration(
-                                        hintText: StringsRes.password,
+                                        hintText:
+                                            translation(context).passwordHint,
                                         hintStyle: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.normal,
-                                            color: ColorsRes.grayColor
-                                                .withOpacity(0.5)),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.normal,
+                                          color: ColorsRes.grayColor
+                                              .withOpacity(0.5),
+                                        ),
                                         border: InputBorder.none,
                                         suffixIcon: GestureDetector(
                                           onTap: () {
@@ -418,24 +445,29 @@ class _SignupActivityState extends State<SignupActivity>
                                       StringsRes.confirmpassword,
                                       style: TextStyle(
                                           fontSize: 18,
-                                          color: ColorsRes.black,
                                           fontWeight: FontWeight.normal),
                                     ),
                                   ),
 
-                                  /// confirm password textfield
                                   Container(
                                     height: MediaQuery.of(context).size.height *
                                         0.06,
                                     width:
                                         MediaQuery.of(context).size.width * 0.9,
-                                    decoration: DesignConfig
-                                        .boxDecorationContainerShadow(
-                                            ColorsRes.containerShadowColor,
-                                            10,
-                                            10,
-                                            10,
-                                            10),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          inputBackgroundColor, // Use the determined color here
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: borderColor,
+                                          blurRadius:
+                                              3, // Set the specified blur radius
+                                          spreadRadius:
+                                              1, // Set the specified spread radius
+                                        ),
+                                      ],
+                                    ),
                                     margin: EdgeInsets.only(top: 2),
                                     padding: EdgeInsets.only(left: 10),
                                     child: TextFormField(
@@ -445,12 +477,14 @@ class _SignupActivityState extends State<SignupActivity>
                                           color: ColorsRes.black, fontSize: 16),
                                       cursorColor: ColorsRes.black,
                                       decoration: InputDecoration(
-                                        hintText: StringsRes.password,
+                                        hintText:
+                                            translation(context).confirmPassord,
                                         hintStyle: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.normal,
-                                            color: ColorsRes.grayColor
-                                                .withOpacity(0.5)),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.normal,
+                                          color: ColorsRes.grayColor
+                                              .withOpacity(0.5),
+                                        ),
                                         border: InputBorder.none,
                                         suffixIcon: GestureDetector(
                                           onTap: () {
@@ -517,13 +551,18 @@ class _SignupActivityState extends State<SignupActivity>
                                           padding: EdgeInsets.only(
                                               top: 13, bottom: 13),
                                           alignment: Alignment.center,
-                                          decoration:
-                                              DesignConfig.buttonShadowColor(
-                                                  ColorsRes.secondaryColor,
-                                                  37,
-                                                  ColorsRes.secondaryColor),
+                                          decoration: BoxDecoration(
+                                            color: ColorsRes.secondaryColor,
+                                            borderRadius: BorderRadius.circular(
+                                                10), // Set the corner radius here
+                                            boxShadow: [
+                                              BoxShadow(
+                                                  // Shadow properties...
+                                                  ),
+                                            ],
+                                          ),
                                           child: Text(
-                                            StringsRes.lblsignup,
+                                            translation(context).signUp,
                                             style: TextStyle(
                                                 fontSize: 17,
                                                 color: ColorsRes.white,
@@ -539,11 +578,12 @@ class _SignupActivityState extends State<SignupActivity>
                                   RichText(
                                     text: TextSpan(
                                         style: new TextStyle(
-                                            color: ColorsRes.white),
-                                        text: StringsRes.alreadyhvac,
+                                            color: ColorsRes.secondaryColor),
+                                        text: translation(context).haveAccount +
+                                            " ",
                                         children: <TextSpan>[
                                           TextSpan(
-                                            text: StringsRes.lblsignin,
+                                            text: translation(context).signIn,
                                             style: TextStyle(
                                               color: ColorsRes.secondaryColor,
                                             ),
@@ -589,8 +629,6 @@ class _SignupActivityState extends State<SignupActivity>
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 1,
-        backgroundColor: ColorsRes.black,
-        textColor: ColorsRes.white,
         fontSize: 16.0);
   }
 }

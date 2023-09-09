@@ -6,12 +6,10 @@ import 'package:pamride/controllers/account_controller.dart';
 import 'package:pamride/controllers/client_controller.dart';
 import 'package:pamride/graphql/__generated__/operations.req.gql.dart';
 import 'package:pamride/helpers/ColorsRes.dart';
-import 'package:pamride/helpers/DesignConfig.dart';
 import 'package:pamride/helpers/GrobagColor.dart';
-import 'package:pamride/pages/mobile/edit_profile_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:pamride/helpers/Language_Constants.dart';
 import 'package:pamride/widgets/images.dart';
-import 'package:pamride/widgets/social_media_buttons.dart';
 import 'package:pamride/widgets/user_utlities.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,6 +22,7 @@ class _ProfilePageState extends State<ProfilePage> {
   AccountController _accountController = Get.find<AccountController>();
   ClientController _clientController = Get.find<ClientController>();
   FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  var currentPage = ProfileSections.dashboard;
 
   String profileExtension = ".jpg";
   String user = 'Guest', email = '', imageName = '';
@@ -76,7 +75,6 @@ class _ProfilePageState extends State<ProfilePage> {
       extendBody: true,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: ColorsRes.backgroundColor,
         title: Row(
           children: [
             Column(
@@ -89,9 +87,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       return Row(children: [
                         Text(
                           _accountController.isDriver.value
-                              ? 'Account Settings'
-                              : 'Account Settings',
-                          style: TextStyle(fontSize: 20, color: Colors.black),
+                              ? translation(context).accountSettings
+                              : translation(context).accountSettings,
+                          style: TextStyle(fontSize: 20),
                         ),
                       ]);
                     }),
@@ -116,25 +114,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     _getHeader(),
                     Divider(),
-                    missionVision(),
-                    termsAndConditions(),
-                    rateAppOnPlayStore(),
-                    shareApp(context, referalCode),
-                    support(),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(
-                        'Entema for Android, v1.0.1, (${DateTime.now().year})',
-                        style: TextStyle(
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                            fontFamily: GoogleFonts.poppins().fontFamily),
-                      ),
-                    ),
+                    ProfileSection(),
                   ],
                 ),
               ),
@@ -151,184 +131,291 @@ class _ProfilePageState extends State<ProfilePage> {
           bottom: 0.0,
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isupLoadingImage = true;
-                        });
-                        pickUpdateUserImage(
-                            _accountController, user, stopLoadingCallBack);
-                      },
-                      child: Container(
-                        margin: EdgeInsetsDirectional.only(bottom: 17),
-                        height: 100,
-                        width: 100,
-                        decoration: BoxDecoration(
-                            color: Colors.grey.shade300,
-                            shape: BoxShape.circle,
-                            border: Border.all(width: 1.0, color: white)),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(100.0),
-                          child: Stack(
-                            children: [
-                              isupLoadingImage
-                                  ? Center(
-                                      child: CircularProgressIndicator(
-                                        color: Colors.orange,
-                                      ),
-                                    )
-                                  : Positioned.fill(
-                                      child: CachedNetworkImage(
-                                        imageUrl: getProfileImageUrl(imageName),
-                                        placeholder: (context, url) =>
-                                            CircularProgressIndicator(),
-                                        errorWidget: (context, url, error) =>
-                                            Icon(Icons.error),
-                                        fit: BoxFit.fill,
-                                      ),
-                                    ),
-                              Positioned(
-                                bottom: 10,
-                                right: 10,
-                                child: Icon(
-                                  Icons.photo_camera,
-                                  color: Colors.blueGrey,
-                                  size: 30,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        //Get.to(EditProfilePage());
-                      },
-                      child: Container(
-                        width: 50,
-                        padding: EdgeInsets.only(top: 5, bottom: 5),
-                        margin: EdgeInsets.only(left: 20, bottom: 20),
-                        alignment: Alignment.center,
-                        decoration: DesignConfig.buttonShadowColor(
-                                ColorsRes.secondaryColor,
-                                37,
-                                ColorsRes.secondaryColor)
-                            .copyWith(borderRadius: BorderRadius.circular(5)),
-                        child: Text(
-                          "Edit",
-                          style: TextStyle(
-                              fontSize: 17,
-                              color: ColorsRes.white,
-                              fontFamily: "Poppins"),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Padding(
-                        padding: const EdgeInsetsDirectional.only(start: 10),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Obx(() {
-                              return Text(
-                                'Hi, John Doe ${_accountController.userName.toString()}',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium!
-                                    .copyWith(color: fontColor),
-                              );
-                            }),
-                            Obx(() {
-                              return Text(
-                                "johndoe@wonderfulemail.com${_accountController.email.toString()}",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleSmall!
-                                    .copyWith(color: fontColor),
-                              );
-                            }),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Loyalty Points',
-                                      style: TextStyle(
-                                          fontSize: 14.0,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text(loyaltyPoints),
-                                  ],
-                                ),
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.info,
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      isupLoadingImage = true;
+                    });
+                    pickUpdateUserImage(
+                        _accountController, user, stopLoadingCallBack);
+                  },
+                  child: Container(
+                    margin: EdgeInsetsDirectional.only(bottom: 17),
+                    height: 80,
+                    width: 80,
+                    decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        shape: BoxShape.circle,
+                        border: Border.all(width: 1.0, color: white)),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(100.0),
+                      child: Stack(
+                        children: [
+                          isupLoadingImage
+                              ? Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.orange,
                                   ),
-                                  onPressed: () {
-                                    // Show a dialog with loyalty points explanation
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: Text('Loyalty Points'),
-                                          content: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text('Earn loyalty points by:'),
-                                              SizedBox(height: 8.0),
-                                              Text(
-                                                  '- Sharing the app (10 pts/invite)'),
-                                              Text(
-                                                  '- Scanning tickets (5 pts/ride)'),
-                                              SizedBox(height: 16.0),
-                                              Text('Losing loyalty points:'),
-                                              SizedBox(height: 8.0),
-                                              Text(
-                                                  '- Rating the app negatively (5 pts/ride)'),
-                                              SizedBox(height: 16.0),
-                                              Text(
-                                                  '1 Loyalty Point equals 0.5 usd , \nLoyalty points can be redeemed to pay for tickets and checks.'),
-                                            ],
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: Text('OK'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
+                                )
+                              : Positioned.fill(
+                                  child: CachedNetworkImage(
+                                    imageUrl: getProfileImageUrl(imageName),
+                                    placeholder: (context, url) =>
+                                        CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) =>
+                                        Icon(Icons.error),
+                                    fit: BoxFit.fill,
+                                  ),
                                 ),
-                              ],
+                          Positioned(
+                            bottom: 10,
+                            right: 10,
+                            child: Icon(
+                              Icons.photo_camera,
+                              color: Colors.blueGrey,
+                              size: 30,
                             ),
-                          ],
-                        )),
-                  ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
+                //   Row(
+                //     children: [
+                //       Padding(
+                //           padding: const EdgeInsetsDirectional.only(start: 10),
+                //           child: Column(
+                //             mainAxisSize: MainAxisSize.min,
+                //             crossAxisAlignment: CrossAxisAlignment.start,
+                //             children: [
+                //               Obx(() {
+                //                 return Text(
+                //                   'Hi, John Doe ${_accountController.userName.toString()}',
+                //                   style: Theme.of(context).textTheme.titleMedium!,
+                //                 );
+                //               }),
+                //               Obx(() {
+                //                 return Text(
+                //                   "johndoe@wonderfulemail.com${_accountController.email.toString()}",
+                //                   style: Theme.of(context).textTheme.titleSmall!,
+                //                 );
+                //               }),
+                //               Row(
+                //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //                 children: [
+                //                   Column(
+                //                     crossAxisAlignment: CrossAxisAlignment.start,
+                //                     children: [
+                //                       Text(
+                //                         'Loyalty Points',
+                //                         style: TextStyle(
+                //                             fontSize: 14.0,
+                //                             fontWeight: FontWeight.bold),
+                //                       ),
+                //                       Text(loyaltyPoints),
+                //                     ],
+                //                   ),
+                //                   IconButton(
+                //                     icon: Icon(
+                //                       Icons.info,
+                //                     ),
+                //                     onPressed: () {
+                //                       // Show a dialog with loyalty points explanation
+                //                       showDialog(
+                //                         context: context,
+                //                         builder: (BuildContext context) {
+                //                           return AlertDialog(
+                //                             title: Text('Loyalty Points'),
+                //                             content: Column(
+                //                               mainAxisSize: MainAxisSize.min,
+                //                               crossAxisAlignment:
+                //                                   CrossAxisAlignment.start,
+                //                               children: [
+                //                                 Text('Earn loyalty points by:'),
+                //                                 SizedBox(height: 8.0),
+                //                                 Text(
+                //                                     '- Sharing the app (10 pts/invite)'),
+                //                                 Text(
+                //                                     '- Scanning tickets (5 pts/ride)'),
+                //                                 SizedBox(height: 16.0),
+                //                                 Text('Losing loyalty points:'),
+                //                                 SizedBox(height: 8.0),
+                //                                 Text(
+                //                                     '- Rating the app negatively (5 pts/ride)'),
+                //                                 SizedBox(height: 16.0),
+                //                                 Text(
+                //                                     '1 Loyalty Point equals 0.5 usd , \nLoyalty points can be redeemed to pay for tickets and checks.'),
+                //                               ],
+                //                             ),
+                //                             actions: [
+                //                               TextButton(
+                //                                 onPressed: () {
+                //                                   Navigator.of(context).pop();
+                //                                 },
+                //                                 child: Text('OK'),
+                //                               ),
+                //                             ],
+                //                           );
+                //                         },
+                //                       );
+                //                     },
+                //                   ),
+                //                 ],
+                //               ),
+                //             ],
+                //           )),
+                //     ],
+                //   ),
+                //
               ],
             ),
           ],
         ));
   }
+
+  Widget ProfileSection() {
+    return Container(
+      padding: EdgeInsets.only(
+        top: 5,
+      ),
+      child: Column(
+        // shows the list of menu drawer
+        children: [
+          menuItem(5, "Highness Name", Icons.settings_outlined,
+              currentPage == ProfileSections.settings ? true : false),
+          menuItem(6, "Last Name", Icons.notifications_outlined,
+              currentPage == ProfileSections.notifications ? true : false),
+          // menuItem(5, "Phone number", Icons.settings_outlined,
+          //     currentPage == ProfileSections.settings ? true : false),
+          // menuItem(6, "Email", Icons.notifications_outlined,
+          //     currentPage == ProfileSections.notifications ? true : false),
+          // menuItem(5, "Gender", Icons.settings_outlined,
+          //     currentPage == ProfileSections.settings ? true : false),
+          // menuItem(6, "Birthday", Icons.notifications_outlined,
+          //     currentPage == ProfileSections.notifications ? true : false),
+          Divider(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Switch(
+                value: true,
+                activeColor: ColorsRes.secondaryColor,
+                onChanged: (value) => {},
+              ),
+              menuItem(7, translation(context).emailNotifications, null,
+                  currentPage == ProfileSections.privacy_policy ? true : false),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Switch(
+                value: false,
+                activeColor: ColorsRes.secondaryColor,
+                onChanged: (value) => {},
+              ),
+              menuItem(8, translation(context).textNotifications, null,
+                  currentPage == ProfileSections.send_feedback ? true : false),
+            ],
+          ),
+          menuItem(9, translation(context).changePassword, Icons.arrow_back,
+              currentPage == ProfileSections.settings ? true : false),
+          menuItem(
+              10,
+              translation(context).privacyPolicy,
+              Icons.arrow_back_outlined,
+              currentPage == ProfileSections.notifications ? true : false),
+          Divider(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Icon(Icons.arrow_back_sharp),
+              Row(
+                children: [
+                  Text(
+                    translation(context).logOut,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.red,
+                    ),
+                  ),
+                  IconButton(
+                      onPressed: () => {},
+                      icon: Icon(
+                        Icons.logout,
+                        color: Colors.red,
+                      ))
+                ],
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget menuItem(int id, String title, IconData? icon, bool selected) {
+    return Material(
+      color: selected ? ColorsRes.secondaryColor : Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          Navigator.pop(context);
+          setState(() {
+            if (id == 1) {
+              currentPage = ProfileSections.dashboard;
+            } else if (id == 2) {
+              currentPage = ProfileSections.contacts;
+            } else if (id == 3) {
+              currentPage = ProfileSections.events;
+            } else if (id == 4) {
+              currentPage = ProfileSections.notes;
+            } else if (id == 5) {
+              currentPage = ProfileSections.settings;
+            } else if (id == 6) {
+              currentPage = ProfileSections.notifications;
+            } else if (id == 7) {
+              currentPage = ProfileSections.privacy_policy;
+            } else if (id == 8) {
+              currentPage = ProfileSections.send_feedback;
+            }
+          });
+        },
+        child: Padding(
+          padding: EdgeInsets.all(15.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Icon(
+                icon,
+                size: 20,
+              ),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+enum ProfileSections {
+  dashboard,
+  contacts,
+  events,
+  notes,
+  settings,
+  notifications,
+  privacy_policy,
+  send_feedback,
 }

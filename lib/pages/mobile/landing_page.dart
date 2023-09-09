@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:pamride/helpers/ColorsRes.dart';
-import 'package:pamride/widgets/rides_search_algolia.dart';
-import 'package:pamride/widgets/search_overlay.dart';
+import 'package:pamride/helpers/Language_Constants.dart';
+import 'package:pamride/provider/theme_provider.dart';
+import 'package:pamride/widgets/drawer_header.dart';
 import 'package:pamride/widgets/user_utlities.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import '../../components/constant.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 
@@ -25,6 +26,7 @@ class _LandingPageState extends State<LandingPage> {
   String userLocation = "";
   ScrollController _scrollController = ScrollController();
   FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  var currentPage = DrawerSections.dashboard;
 
   @override
   void initState() {
@@ -37,16 +39,32 @@ class _LandingPageState extends State<LandingPage> {
     return Scaffold(
       key: _scaffoldKey,
       extendBody: true,
-      backgroundColor: ColorsRes.backgroundColor,
       drawer: Theme(
-        data: Theme.of(context).copyWith(
-          /// Set the transparency here
-          canvasColor: Colors
-              .transparent, //or any other color you want. e.g Colors.blue.withOpacity(0.5)
-        ),
+        data: Theme.of(context),
         child: Drawer(
           width: MediaQuery.of(context).size.width,
-          child: SearchRidesPage(),
+          child: SingleChildScrollView(
+            child: Container(
+              child: Column(
+                children: [
+                  MyHeaderDrawer(),
+                  MyDrawerList(),
+                ],
+              ),
+            ),
+          ), //SearchOffers(),
+        ),
+      ),
+      endDrawer: Drawer(
+        child: SingleChildScrollView(
+          child: Container(
+            child: Column(
+              children: [
+                MyHeaderDrawer(),
+                MyDrawerList(),
+              ],
+            ),
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -58,7 +76,7 @@ class _LandingPageState extends State<LandingPage> {
               Column(
                 children: [
                   SizedBox(height: 40),
-                  popularLocations(),
+                  upcomingGames(),
                 ],
               ),
               Visibility(
@@ -81,7 +99,6 @@ class _LandingPageState extends State<LandingPage> {
                     child: Center(
                       child: Icon(
                         Icons.keyboard_arrow_up_outlined,
-                        color: Colors.white,
                         size: 30,
                       ),
                     ),
@@ -96,26 +113,109 @@ class _LandingPageState extends State<LandingPage> {
   }
 
   // search bar
-  popularLocations() {
+  upcomingGames() {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Stack(
       children: [
-        Positioned.fill(
-          child: landingPageBanner(),
-        ),
+        Padding(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).size.height * 0.015,
+              bottom: MediaQuery.of(context).size.height * 0.01,
+              right: MediaQuery.of(context).size.height * 0.01,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Stack(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.notifications,
+                        color: Theme.of(context)
+                            .iconTheme
+                            .color, // Use the theme's icon color
+                        size: 24,
+                      ), // Notification icon
+                      onPressed: () {
+                        // Add your button's action here
+                        // This function will be called when the button is pressed
+                      },
+                    ),
+                    Positioned(
+                      right: 10,
+                      top: 10,
+                      child: Container(
+                        padding: EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color:
+                              Colors.red, // Background color for the indicator
+                          shape: BoxShape.circle, // Make it a circle
+                        ),
+                        child: Text(
+                          '3', // The text you want to display
+                          style: TextStyle(
+                            color: Colors.white, // Text color
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10, // Adjust font size as needed
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                IconButton(
+                  icon: Icon(Icons.more_vert), // "more_vert" icon
+                  onPressed: () {
+                    // Add your button's action here
+                    // This function will be called when the button is pressed
+                    if (_scaffoldKey.currentState!.isDrawerOpen) {
+                      _scaffoldKey.currentState!.openEndDrawer();
+                    } else {
+                      _scaffoldKey.currentState!.openDrawer();
+                    }
+                  },
+                ),
+              ],
+            )),
         Positioned(
             child: Padding(
           padding: EdgeInsets.only(
-            top: MediaQuery.of(context).size.height * 0.04,
+            top: MediaQuery.of(context).size.height * 0.16,
             bottom: MediaQuery.of(context).size.height * 0.01,
             left: MediaQuery.of(context).size.height * 0.01,
             right: MediaQuery.of(context).size.height * 0.01,
           ),
-          child: searchBar(),
+          child: Text(translation(context).appDescription),
         )),
+        Positioned(
+            child: Padding(
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.3,
+                  bottom: MediaQuery.of(context).size.height * 0.01,
+                  left: MediaQuery.of(context).size.height * 0.01,
+                  right: MediaQuery.of(context).size.height * 0.01,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Column(
+                      children: [
+                        Text(translation(context).seeAll),
+                        seeAll(),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text(translation(context).usePoints),
+                        usePoints(),
+                      ],
+                    ),
+                  ],
+                ))),
         Positioned(
           child: Padding(
             padding: EdgeInsets.only(
-                top: MediaQuery.of(context).size.height * 0.15,
+                top: MediaQuery.of(context).size.height * 0.5,
                 bottom: MediaQuery.of(context).size.height * 0.01),
             child: selectService(),
           ),
@@ -124,24 +224,34 @@ class _LandingPageState extends State<LandingPage> {
     );
   }
 
-  // bg banner
-  landingPageBanner() {
-    return Padding(
-      padding: const EdgeInsets.all(fixPadding * 2.0),
-      child: InkWell(
-        onTap: () {},
-        borderRadius: BorderRadius.circular(10.0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10.0),
-          child: Image.asset(
-            'assets/images/banner.jpeg',
-            color: Colors.white.withOpacity(0.9),
-            colorBlendMode: BlendMode.modulate,
-            fit: BoxFit.cover,
-          ),
+  usePoints() {
+    return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10), // Adjust the value as needed
         ),
-      ),
-    );
+        child: Column(
+          children: [
+            SizedBox(
+              height: 100,
+              width: 150,
+            ),
+          ],
+        ));
+  }
+
+  seeAll() {
+    return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10), // Adjust the value as needed
+        ),
+        child: Column(
+          children: [
+            SizedBox(
+              height: 100,
+              width: 150,
+            ),
+          ],
+        ));
   }
 
   /// function to display the search bar for searching a ride
@@ -162,12 +272,10 @@ class _LandingPageState extends State<LandingPage> {
           width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10.0),
-            color: whiteColor,
             boxShadow: [
               BoxShadow(
                 blurRadius: 4.0,
                 spreadRadius: 1.0,
-                color: blackColor.withOpacity(0.25),
               ),
             ],
           ),
@@ -180,12 +288,6 @@ class _LandingPageState extends State<LandingPage> {
               Icon(
                 Icons.search,
                 size: 24.0,
-                color: primaryColor,
-              ),
-              widthSpace,
-              Text(
-                'Search for offers',
-                style: grey14MediumTextStyle,
               ),
             ],
           ),
@@ -199,27 +301,30 @@ class _LandingPageState extends State<LandingPage> {
     // if index 0 has a title, data has been loaded
     if (isPopularPlacesLoaded == false) {
       return Container(
-        height: 100,
+        height: 200,
         alignment: Alignment.center,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Text(translation(context).nextMatches, style: black16BoldTextStyle),
+            SizedBox(height: 10),
             CircularProgressIndicator(),
+            SizedBox(height: 10),
             Stack(
               children: [
                 Text(
-                  'Loading Partner Companies',
+                  translation(context).loadingNextMatches,
                   style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 Text(
-                  'Loading Partner Companies',
+                  translation(context).loadingNextMatches,
                   style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             )
@@ -241,7 +346,6 @@ class _LandingPageState extends State<LandingPage> {
                 Text(
                   'See Ads from Popular Partner Companies',
                   style: TextStyle(
-                    color: Colors.black,
                     fontSize: 16.0,
                     fontWeight: FontWeight.w700,
                   ),
@@ -272,13 +376,6 @@ class _LandingPageState extends State<LandingPage> {
                     setState(() {
                       selectedTitle = item['title'];
                     });
-                    // showOverlay(context); // Call the method to show the overlay
-
-                    // if (_scaffoldKey.currentState!.isDrawerOpen) {
-                    //   _scaffoldKey.currentState!.openEndDrawer();
-                    // } else {
-                    //   _scaffoldKey.currentState!.openDrawer();
-                    // }
                   },
                   borderRadius: BorderRadius.circular(10.0),
                   child: Column(
@@ -308,7 +405,6 @@ class _LandingPageState extends State<LandingPage> {
                         height: 30.0,
                         alignment: Alignment.bottomCenter,
                         child: Chip(
-                          backgroundColor: Colors.white,
                           label: Text(
                             item['title'].length > 8
                                 ? item['title'].substring(0, 8) + '...'
@@ -330,15 +426,89 @@ class _LandingPageState extends State<LandingPage> {
     );
   }
 
-  Future<void> showOverlay(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('overlayTitle', selectedTitle!);
-    overlayEntry = OverlayEntry(
-      builder: (BuildContext context) {
-        return SearchOverlay(
-          origin: selectedTitle,
-        );
-      },
+  Widget MyDrawerList() {
+    return Container(
+      padding: EdgeInsets.only(
+        top: 15,
+      ),
+      child: Column(
+        // shows the list of menu drawer
+        children: [
+          menuItem(1, "Change Language", Icons.language,
+              currentPage == DrawerSections.dashboard ? true : false),
+          menuItem(2, "Favorite", Icons.favorite,
+              currentPage == DrawerSections.contacts ? true : false),
+          menuItem(3, "My Reward", Icons.present_to_all,
+              currentPage == DrawerSections.events ? true : false),
+          menuItem(4, "About Entema", Icons.notes,
+              currentPage == DrawerSections.notes ? true : false),
+          menuItem(4, "Contact Us", Icons.contact_support,
+              currentPage == DrawerSections.notes ? true : false),
+        ],
+      ),
     );
   }
+
+  Widget menuItem(int id, String title, IconData icon, bool selected) {
+    return Material(
+      color: selected ? ColorsRes.secondaryColor : Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          Navigator.pop(context);
+          setState(() {
+            if (id == 1) {
+              currentPage = DrawerSections.dashboard;
+            } else if (id == 2) {
+              currentPage = DrawerSections.contacts;
+            } else if (id == 3) {
+              currentPage = DrawerSections.events;
+            } else if (id == 4) {
+              currentPage = DrawerSections.notes;
+            } else if (id == 5) {
+              currentPage = DrawerSections.settings;
+            } else if (id == 6) {
+              currentPage = DrawerSections.notifications;
+            } else if (id == 7) {
+              currentPage = DrawerSections.privacy_policy;
+            } else if (id == 8) {
+              currentPage = DrawerSections.send_feedback;
+            }
+          });
+        },
+        child: Padding(
+          padding: EdgeInsets.all(15.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: Icon(
+                  icon,
+                  size: 20,
+                ),
+              ),
+              Expanded(
+                flex: 3,
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+enum DrawerSections {
+  dashboard,
+  contacts,
+  events,
+  notes,
+  settings,
+  notifications,
+  privacy_policy,
+  send_feedback,
 }

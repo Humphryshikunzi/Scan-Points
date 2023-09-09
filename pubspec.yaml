@@ -91,6 +91,8 @@ dependencies:
   upgrader: 
   dots_indicator: 
   qr_code_scanner:
+  flutter_localizations:
+    sdk: flutter
   
 dev_dependencies:
   flutter_test:
@@ -119,3 +121,5 @@ flutter:
     - assets/
     - assets/assets/
     - .env
+
+  generate: true

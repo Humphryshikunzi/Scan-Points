@@ -8,8 +8,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/directions.dart' hide Polyline;
 import 'package:google_maps_webservice/places.dart';
 import 'package:pamride/helpers/Constant.dart';
-import 'package:pamride/helpers/Maps.dart';
-import 'package:pamride/pages/mobile/post_ride_form.dart';
+import 'package:pamride/helpers/Maps.dart'; 
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../helpers/ColorsRes.dart';
 import '../../helpers/DesignConfig.dart';
@@ -507,16 +506,7 @@ class _MapScreenState extends State<MapScreen> {
         elevation: 16,
         child: InkWell(
           onTap: () {
-            routeSelected
-                ? Get.to(() => PostRideForm(
-                      origin: pickupLocationTxt,
-                      distance: selectedDistance,
-                      destination: dropLocationTxt,
-                      duration: totalDuration,
-                      routeIndex: routeIndex,
-                      myCars: widget.myCars,
-                    ))
-                : Text("");
+             
           },
           splashColor: Colors.orange,
           child: Container(

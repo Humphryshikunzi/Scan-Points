@@ -5,8 +5,7 @@ import 'package:pamride/components/sorting_details.dart';
 import 'package:pamride/components/tabs.dart';
 import 'package:pamride/controllers/reponsiveness.dart';
 import 'package:pamride/helpers/ColorsRes.dart';
-import 'package:pamride/widgets/landing_grid.dart';
-import '../../components/grid_tickets.dart';
+import 'package:pamride/widgets/landing_grid.dart'; 
 
 class ResultPageLoadMore extends StatefulWidget {
   const ResultPageLoadMore({Key? key}) : super(key: key);
@@ -80,8 +79,7 @@ class _ResultPageState extends State<ResultPageLoadMore> {
                       SortingDetails(),
                       SizedBox(height: 15.0),
                       MyTabs(),
-                      SizedBox(height: 10.0),
-                      GridTickets()
+                      SizedBox(height: 10.0), 
                     ],
                   ),
                 )

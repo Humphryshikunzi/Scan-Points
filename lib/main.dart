@@ -5,7 +5,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:form_builder_validators/localization/l10n.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -13,15 +12,19 @@ import 'package:pamride/components/messages/preferences.dart';
 import 'package:pamride/controllers/client_controller.dart';
 import 'package:pamride/controllers/rides_controller.dart';
 import 'package:pamride/helpers/ColorsRes.dart';
+import 'package:pamride/helpers/Language_Constants.dart';
 import 'package:pamride/helpers/client.dart';
 import 'package:pamride/pages/mobile/home_page.dart';
-import 'package:pamride/pages/mobile/pre_sign_up.dart'; 
+import 'package:pamride/pages/mobile/pre_sign_up.dart';
+import 'package:pamride/provider/theme_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'components/constant.dart';
 import 'controllers/account_controller.dart';
 import 'controllers/navigation_controller.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:upgrader/upgrader.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 Future<void> main() async {
   HttpOverrides.global = MyHttpOverrides();
@@ -112,107 +115,104 @@ Future<void> _firebaseMessagingBackgroundHandler(message) async {
   // do something with the message
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+
+  static void setLocale(BuildContext context, Locale newLocale) {
+    _MyAppState? state = context.findAncestorStateOfType<_MyAppState>();
+    state?.setLocale(newLocale);
+  }
+}
+
+class _MyAppState extends State<MyApp> {
+  Locale? _locale;
+
+  setLocale(Locale locale) {
+    setState(() {
+      _locale = locale;
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    getLocale().then((locale) => {setLocale(locale)});
+    super.didChangeDependencies();
+  }
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
-    ClientController _clientController = Get.find<ClientController>();
-    AccountController _accountController = Get.find<AccountController>();
+  Widget build(BuildContext context) => ChangeNotifierProvider(
+        create: (context) => ThemeProvider(),
+        builder: (context, _) {
+          ClientController _clientController = Get.find<ClientController>();
+          AccountController _accountController = Get.find<AccountController>();
 
-    //_clientController.initialize();
+          //_clientController.initialize();
+          final themeProvider = Provider.of<ThemeProvider>(context);
 
-    return GetMaterialApp(
-      localizationsDelegates: [
-        FormBuilderLocalizations.delegate,
-      ],
-      home: FutureBuilder<dynamic>(
-          future: _accountController.fetchToken(),
-          builder: (BuildContext ctx, AsyncSnapshot snapshot) {
-            // Checking if future is resolved
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: CircularProgressIndicator(
-                  color: ColorsRes.appcolor_material,
-                ),
-              );
-            }
-            if (snapshot.hasError) {
-              return UpgradeAlert(
-                upgrader: Upgrader(dialogStyle: UpgradeDialogStyle.material),
-                child: PreSignUpPage(
-                  backButtonEnabled: false,
-                ),
-              );
-            }
-            if (snapshot.hasData) {
-              var data = snapshot.data;
+          return GetMaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: FutureBuilder<dynamic>(
+                future: _accountController.fetchToken(),
+                builder: (BuildContext ctx, AsyncSnapshot snapshot) {
+                  // Checking if future is resolved
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: ColorsRes.appcolor_material,
+                      ),
+                    );
+                  }
+                  if (snapshot.hasError) {
+                    return UpgradeAlert(
+                      upgrader:
+                          Upgrader(dialogStyle: UpgradeDialogStyle.material),
+                      child: PreSignUpPage(
+                        backButtonEnabled: false,
+                      ),
+                    );
+                  }
+                  if (snapshot.hasData) {
+                    var data = snapshot.data;
 
-              if (data != false) {
-                return UpgradeAlert(
-                  upgrader: Upgrader(dialogStyle: UpgradeDialogStyle.material),
-                  child: HomePage(),
-                );
-              } else {
-                return UpgradeAlert(
-                  upgrader: Upgrader(dialogStyle: UpgradeDialogStyle.material),
-                  child: PreSignUpPage(
-                    backButtonEnabled: false,
-                  ),
-                );
-              }
-            }
-            return UpgradeAlert(
-              upgrader: Upgrader(dialogStyle: UpgradeDialogStyle.material),
-              child: PreSignUpPage(
-                backButtonEnabled: false,
-              ),
-            );
-          }),
-      //MyHomePage(),
-      debugShowCheckedModeBanner: false,
-      title: 'Entema',
-      theme: ThemeData(
-        textTheme: const TextTheme(
-          headline1: TextStyle(
-            color: mainText,
-            fontFamily: 'Inter',
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
-          ),
-          headline2: TextStyle(
-            color: mainText,
-            fontFamily: 'Inter',
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
-          ),
-          headline3: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-          ),
-          bodyText1: TextStyle(
-            color: SecondaryText,
-            fontFamily: 'Inter',
-            fontSize: 17,
-            fontWeight: FontWeight.w500,
-          ),
-          bodyText2: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-          ),
-          subtitle1: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        primarySwatch: Colors.blue,
-      ),
-    );
-  }
+                    if (data != false) {
+                      return UpgradeAlert(
+                        upgrader:
+                            Upgrader(dialogStyle: UpgradeDialogStyle.material),
+                        child: HomePage(),
+                      );
+                    } else {
+                      return UpgradeAlert(
+                        upgrader:
+                            Upgrader(dialogStyle: UpgradeDialogStyle.material),
+                        child: PreSignUpPage(
+                          backButtonEnabled: false,
+                        ),
+                      );
+                    }
+                  }
+                  return UpgradeAlert(
+                    upgrader:
+                        Upgrader(dialogStyle: UpgradeDialogStyle.material),
+                    child: PreSignUpPage(
+                      backButtonEnabled: false,
+                    ),
+                  );
+                }),
+            //MyHomePage(),
+            debugShowCheckedModeBanner: false,
+            locale: _locale,
+            title: "Entema",
+            theme: MyThemes.lightTheme,
+            darkTheme: MyThemes.darkTheme,
+            themeMode: themeProvider.themeMode,
+          );
+        },
+      );
 }
 
 class MyHttpOverrides extends HttpOverrides {

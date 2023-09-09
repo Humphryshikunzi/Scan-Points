@@ -10,8 +10,7 @@ import 'package:pamride/helpers/DesignConfig.dart';
 import 'package:pamride/widgets/images.dart';
 import 'package:pamride/widgets/user_utlities.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../graphql/__generated__/operations.req.gql.dart';
-import 'driver_home.dart';
+import '../../graphql/__generated__/operations.req.gql.dart'; 
 import 'home_page.dart';
 
 class AddProfilePage extends StatefulWidget {
@@ -327,11 +326,7 @@ class _AddProfilePageState extends State<AddProfilePage> {
     _clientController.client.request(getUserIdReq).listen((event) {
       if (event.data!.users.first.id!.isNotEmpty) {
         _accountController.accountId = event.data!.users.first.id.obs;
-        if (widget.isDriver) {
-          Get.off(() => PostRidePage());
-        } else {
-          Get.off(() => HomePage());
-        }
+        Get.off(() => HomePage());
       }
     });
   }

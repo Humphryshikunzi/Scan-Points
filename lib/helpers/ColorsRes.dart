@@ -43,7 +43,7 @@ class ColorsRes {
   static const Color splashbackgroundColor = Color(0xfff5f2da);
   static const Color blackTransparentColor = Color(0x80000000);
 
-  static const Color secondaryColor = Color.fromRGBO(155, 132, 241, 1);
+  static const Color secondaryColor = Color.fromRGBO(157, 133, 244, 1);
 
   static const MaterialColor appcolor_material = const MaterialColor(
     0xFFFE724C,

@@ -1,4 +1,3 @@
-import 'package:ferry/ferry.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,18 +8,14 @@ import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:pamride/controllers/account_controller.dart';
 import 'package:pamride/controllers/client_controller.dart';
-import 'package:pamride/controllers/preference_controller.dart';
 import 'package:pamride/helpers/ColorsRes.dart';
 import 'package:pamride/helpers/Constant.dart';
 import 'package:pamride/helpers/DesignConfig.dart';
-import 'package:pamride/helpers/StringsRes.dart';
-import 'package:pamride/pages/mobile/driver_home.dart';
-import 'package:pamride/pages/mobile/pre_signup_page.dart';
-import 'package:pamride/pages/mobile/reset_password_request.dart';
 import 'package:pamride/pages/mobile/signup_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../graphql/__generated__/operations.req.gql.dart';
 import 'home_page.dart';
+import 'package:pamride/helpers/Language_Constants.dart';
 
 GlobalKey<ScaffoldState>? scaffoldKey;
 
@@ -67,10 +62,8 @@ class _LoginActivityState extends State<LoginActivity> {
 
   @override
   void initState() {
-    getAllRoles();
     super.initState();
     scaffoldKey = GlobalKey<ScaffoldState>();
-    analytics.setCurrentScreen(screenName: "Login");
   }
 
   Future<bool> _backPress() {
@@ -95,327 +88,290 @@ class _LoginActivityState extends State<LoginActivity> {
       ),
     );
 
+    Color inputBackgroundColor =
+        Theme.of(context).brightness == Brightness.light
+            ? Colors.white // Light mode background color
+            : Colors.black; // Dark mode background color
+
+    Color borderColor = Theme.of(context).brightness == Brightness.light
+        ? ColorsRes.secondaryColor // Light mode background color
+        : ColorsRes.grayColor; // Dark mode background color
+
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       extendBody: true,
-      backgroundColor: ColorsRes.black,
-      body: WillPopScope(
-        onWillPop: _backPress,
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          padding: EdgeInsets.only(left: 20, right: 20),
-          child: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: 50,
-                  ),
-                  Container(
-                    decoration:
-                        BoxDecoration(color: ColorsRes.blackTransparentColor),
-                    child: Center(
-                      child: Image.asset(
-                        "assets/images/logo.png",
-                        width: MediaQuery.of(context).size.width * 0.3,
-                      ),
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        padding: EdgeInsets.only(left: 20, right: 20),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 50,
+                ),
+                Container(
+                  child: Center(
+                    child: Image.asset(
+                      isDarkMode
+                          ? "assets/images/logo.png"
+                          : "assets/images/logo_light.jpeg",
+                      width: MediaQuery.of(context).size.width * 0.3,
                     ),
                   ),
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.57,
-                    width: MediaQuery.of(context).size.height * 0.9,
-                    decoration: BoxDecoration(color: Colors.transparent),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          /// Login text
-                          Align(
-                            alignment: Alignment.center,
-                            child: Text(
-                              "Entema",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall!
-                                  .merge(
-                                    TextStyle(
-                                        color: ColorsRes.white,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                            ),
+                ),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.56,
+                  width: MediaQuery.of(context).size.height * 0.9,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        /// Login text
+                        Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            translation(context).appName,
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall!
+                                .merge(
+                                  TextStyle(fontWeight: FontWeight.bold),
+                                ),
                           ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Text(
-                            "Sign in",
-                            style:
-                                Theme.of(context).textTheme.displaySmall!.merge(
-                                      TextStyle(
-                                          color: ColorsRes.secondaryColor,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            "Welcome, Sign in with Entema",
-                            style:
-                                Theme.of(context).textTheme.displaySmall!.merge(
-                                      TextStyle(
-                                          color: ColorsRes.white,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                          ),
-                          SizedBox(height: 25),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(translation(context).signIn,
+                            style: Theme.of(context).textTheme.titleLarge!),
+                        SizedBox(height: 15),
 
-                          /// email textfield
-                          Container(
-                            height: MediaQuery.of(context).size.height * 0.07,
-                            width: MediaQuery.of(context).size.height * 0.9,
-                            decoration:
-                                DesignConfig.boxDecorationContainerShadow(
-                                    ColorsRes.containerShadowColor,
-                                    10,
-                                    10,
-                                    10,
-                                    10),
-                            margin: EdgeInsets.only(top: 7),
-                            padding:
-                                EdgeInsets.only(left: 10, top: 5, bottom: 5),
-                            child: TextFormField(
-                              style: TextStyle(
-                                  color: ColorsRes.black, fontSize: 16),
-                              cursorColor: ColorsRes.black,
-                              decoration: InputDecoration(
-                                hintText: "username or email",
-                                hintStyle: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.normal,
-                                    color:
-                                        ColorsRes.grayColor.withOpacity(0.5)),
-                                border: InputBorder.none,
+                        // /// email textfield
+                        // Container(
+                        //   height: MediaQuery.of(context).size.height * 0.07,
+                        //   width: MediaQuery.of(context).size.height * 0.9,
+                        //   decoration: DesignConfig.boxDecorationContainerShadow(
+                        //       ColorsRes.containerShadowColor, 10, 10, 10, 10),
+                        //   margin: EdgeInsets.only(top: 7),
+                        //   padding: EdgeInsets.only(left: 10, top: 5, bottom: 5),
+                        //   child: TextFormField(
+                        //     decoration: InputDecoration(
+                        //       hintText: translation(context).usernameOrEmail,
+                        //       hintStyle: TextStyle(
+                        //           fontSize: 16,
+                        //           fontWeight: FontWeight.normal,
+                        //           color: ColorsRes.grayColor.withOpacity(0.5)),
+                        //       border: InputBorder.none,
+                        //     ),
+                        //     keyboardType: TextInputType.emailAddress,
+                        //     controller: edtemail,
+                        //   ),
+                        // ),
+                        Container(
+                          height: MediaQuery.of(context).size.height * 0.07,
+                          width: MediaQuery.of(context).size.height * 0.9,
+                          decoration: BoxDecoration(
+                            color:
+                                inputBackgroundColor, // Use the determined color here
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: borderColor,
+                                blurRadius: 3,
+                                spreadRadius: 1,
                               ),
-                              keyboardType: TextInputType.emailAddress,
-                              controller: edtemail,
-                            ),
+                            ],
                           ),
-                          SizedBox(height: 20),
+                          margin: EdgeInsets.only(top: 7),
+                          padding: EdgeInsets.only(left: 10, top: 5, bottom: 5),
+                          child: TextFormField(
+                            decoration: InputDecoration(
+                              hintText: translation(context).usernameOrEmail,
+                              hintStyle: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.normal,
+                                color: ColorsRes.grayColor.withOpacity(0.5),
+                              ),
+                              border: InputBorder.none,
+                            ),
+                            keyboardType: TextInputType.emailAddress,
+                            controller: edtemail,
+                          ),
+                        ),
+                        SizedBox(height: 20),
 
-                          /// password textfield
-                          Container(
-                            height: MediaQuery.of(context).size.height * 0.07,
-                            width: MediaQuery.of(context).size.height * 0.9,
-                            decoration:
-                                DesignConfig.boxDecorationContainerShadow(
-                                    ColorsRes.containerShadowColor,
-                                    10,
-                                    10,
-                                    10,
-                                    10),
-                            margin: EdgeInsets.only(top: 7),
-                            padding:
-                                EdgeInsets.only(left: 10, top: 5, bottom: 5),
-                            child: TextFormField(
-                              obscureText: _obscureText,
-                              controller: edtpsw,
-                              style: TextStyle(
-                                  color: ColorsRes.black, fontSize: 16),
-                              cursorColor: ColorsRes.black,
-                              decoration: InputDecoration(
-                                hintText: "password",
-                                hintStyle: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.normal,
-                                    color:
-                                        ColorsRes.grayColor.withOpacity(0.5)),
-                                border: InputBorder.none,
-                                suffixIcon: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _obscureText = !_obscureText;
-                                    });
-                                  },
-                                  child: Icon(
-                                    _obscureText
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                    color: ColorsRes.grayColor,
-                                  ),
+                        Container(
+                          height: MediaQuery.of(context).size.height * 0.07,
+                          width: MediaQuery.of(context).size.height * 0.9,
+                          decoration: BoxDecoration(
+                            color:
+                                inputBackgroundColor, // Use the determined color here
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: borderColor,
+                                blurRadius: 3,
+                                spreadRadius: 1,
+                              ),
+                            ],
+                          ),
+                          margin: EdgeInsets.only(top: 7),
+                          padding: EdgeInsets.only(left: 10, top: 5, bottom: 5),
+                          child: TextFormField(
+                            obscureText: _obscureText,
+                            controller: edtpsw,
+                            decoration: InputDecoration(
+                              hintText: translation(context).passwordHint,
+                              hintStyle: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.normal,
+                                color: ColorsRes.grayColor.withOpacity(0.5),
+                              ),
+                              border: InputBorder.none,
+                              suffixIcon: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _obscureText = !_obscureText;
+                                  });
+                                },
+                                child: Icon(
+                                  _obscureText
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                  color: ColorsRes.grayColor,
                                 ),
                               ),
                             ),
                           ),
+                        ),
+                        SizedBox(height: 15),
 
-                          SizedBox(height: 15),
-
-                          /// forgot password text
-                          Container(
-                            alignment: Alignment.topLeft,
-                            child: GestureDetector(
-                              onTap: () {
-                                Get.to(() => HomePage());
-                              },
-                              child: Text(
-                                StringsRes.forgotpassword,
-                                style:
-                                    TextStyle(color: ColorsRes.secondaryColor),
-                              ),
+                        /// forgot password text
+                        Container(
+                          alignment: Alignment.topLeft,
+                          child: GestureDetector(
+                            onTap: () {
+                              Get.to(() => HomePage());
+                            },
+                            child: Text(
+                              translation(context).forgotPassword,
+                              style: TextStyle(color: ColorsRes.secondaryColor),
                             ),
                           ),
+                        ),
 
-                          SizedBox(height: 20),
+                        SizedBox(height: 20),
 
-                          /// the Login button
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 10, right: 10, bottom: 25),
-                            child: GraphQLProvider(
-                              client: client,
-                              child: Mutation(
-                                  options: MutationOptions(
-                                    document: gql(
-                                        loginUserMutation), // this is the mutation string you just created
-                                    // or do something with the result.data on completion
-                                    onCompleted: (dynamic resultData) {
-                                      Navigator.of(context).pushReplacement(
-                                          CupertinoPageRoute(
-                                              builder: (context) =>
-                                                  HomePage()));
-                                    },
-                                    update: (cache, result) {
-                                      debugPrint(result.toString());
-                                      SVProgressHUD.dismiss();
-                                      return cache;
-                                    },
-                                  ),
-                                  builder: (runMutation, result) {
-                                    return IntrinsicHeight(
-                                      child: InkWell(
-                                        onTap: () {
-                                          if (edtemail.text.isEmpty ||
-                                              edtpsw.text.isEmpty) {
-                                            Get.snackbar('Error',
-                                                'Fill all required fields and try again');
-                                          } else {
-                                            SVProgressHUD.show(
-                                                status: "Logging in...");
-                                            runMutation({
-                                              'email': edtemail.text,
-                                              'password': edtpsw.text,
-                                            });
-                                          }
-                                        },
-                                        child: Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.06,
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.9,
-                                          padding: EdgeInsets.only(
-                                              top: 13, bottom: 13),
-                                          alignment: Alignment.center,
-                                          decoration:
-                                              DesignConfig.buttonShadowColor(
-                                                  ColorsRes.secondaryColor,
-                                                  37,
-                                                  ColorsRes.secondaryColor),
-                                          child: Text(
-                                            "Sign in",
-                                            style: TextStyle(
-                                                fontSize: 17,
-                                                color: ColorsRes.white,
-                                                fontWeight: FontWeight.normal,
-                                                fontFamily: "Poppins"),
-                                          ),
+                        /// the Login button
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 10, right: 10, bottom: 25),
+                          child: GraphQLProvider(
+                            client: client,
+                            child: Mutation(
+                                options: MutationOptions(
+                                  document: gql(
+                                      loginUserMutation), // this is the mutation string you just created
+                                  // or do something with the result.data on completion
+                                  onCompleted: (dynamic resultData) {
+                                    Navigator.of(context).pushReplacement(
+                                        CupertinoPageRoute(
+                                            builder: (context) => HomePage()));
+                                  },
+                                  update: (cache, result) {
+                                    debugPrint(result.toString());
+                                    SVProgressHUD.dismiss();
+                                    return cache;
+                                  },
+                                ),
+                                builder: (runMutation, result) {
+                                  return IntrinsicHeight(
+                                    child: InkWell(
+                                      onTap: () {
+                                        if (edtemail.text.isEmpty ||
+                                            edtpsw.text.isEmpty) {
+                                          Get.snackbar('Error',
+                                              'Fill all required fields and try again');
+                                        } else {
+                                          SVProgressHUD.show(
+                                              status: "Logging in...");
+                                          runMutation({
+                                            'email': edtemail.text,
+                                            'password': edtpsw.text,
+                                          });
+                                        }
+                                      },
+                                      child: Container(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.06,
+                                        width:
+                                            MediaQuery.of(context).size.height *
+                                                0.9,
+                                        padding: EdgeInsets.only(
+                                            top: 13, bottom: 13),
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          color: ColorsRes.secondaryColor,
+                                          borderRadius: BorderRadius.circular(
+                                              10), // Set the corner radius here
+                                          boxShadow: [
+                                            BoxShadow(
+                                                // Shadow properties...
+                                                ),
+                                          ],
+                                        ),
+                                        child: Text(
+                                          translation(context).signIn,
+                                          style: TextStyle(
+                                              fontSize: 17,
+                                              color: ColorsRes.white,
+                                              fontWeight: FontWeight.normal,
+                                              fontFamily: "Poppins"),
                                         ),
                                       ),
-                                    );
-                                  }),
-                            ),
+                                    ),
+                                  );
+                                }),
                           ),
+                        ),
 
-                          /// sign up section
-                          RichText(
-                              text: TextSpan(
-                                  style: new TextStyle(color: ColorsRes.white),
-                                  text: "Don't have an account? ",
-                                  children: <TextSpan>[
-                                TextSpan(
-                                    text: "Sign up now",
-                                    style: TextStyle(
-                                        color: ColorsRes.secondaryColor),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () {
-                                        Get.to(() => SignupActivity());
-                                      }),
-                              ])),
-                          SizedBox(
-                            height: 15,
-                          ),
-                        ],
-                      ),
+                        /// sign up section
+                        RichText(
+                            text: TextSpan(
+                                text:
+                                    translation(context).dontHaveAccount + " ",
+                                style:
+                                    TextStyle(color: ColorsRes.secondaryColor),
+                                children: <TextSpan>[
+                              TextSpan(
+                                  text: translation(context).signUp,
+                                  style: TextStyle(
+                                      color: ColorsRes.secondaryColor),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      Get.to(() => SignupActivity());
+                                    }),
+                            ])),
+                        SizedBox(
+                          height: 15,
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(height: 50.0),
-                ],
-              ),
+                ),
+                SizedBox(height: 50.0),
+              ],
             ),
           ),
         ),
       ),
     );
-  }
-
-  Future<bool> getAllRoles() async {
-    final getAllRolesReq = GGetAllRolesReq();
-    _clientController.client.request(getAllRolesReq).listen((event) {
-      if (event.data!.roles.data.isNotEmpty) {
-        for (int i = 0; i < event.data!.roles.data.length; i++) {
-          rolesList.add({
-            "name": event.data!.roles.data[i].name,
-            "id": event.data!.roles.data[i].id,
-          });
-        }
-        debugPrint("Roles List: $rolesList");
-      }
-    });
-    if (rolesList.isEmpty) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
-  void checkIfUserIsDriver({required String userId}) async {
-    SharedPreferences _prefs = await SharedPreferences.getInstance();
-    if (rolesList.isEmpty) {
-      getAllRoles().whenComplete(() => checkIfUserIsDriver(userId: userId));
-    } else {
-      final checkIfUserIsDriverReq = GCheckIfUserIsDriverReq((b) => b
-        ..vars.userId = userId
-        ..vars.driverRoleId = rolesList
-            .where((element) => element['name'] == 'Driver')
-            .first['id']);
-      _clientController.client.request(checkIfUserIsDriverReq).listen((event) {
-        SVProgressHUD.dismiss();
-        if (event.data!.usersInRole.isNotEmpty) {
-          _prefs.setBool("isLoggedInUserADriver", true);
-          _accountController.isUserLoggedInADriver = true.obs;
-        } else {
-          _prefs.setBool("isLoggedInUserADriver", false);
-          _accountController.isUserLoggedInADriver = false.obs;
-          Navigator.of(context).pushReplacement(
-              CupertinoPageRoute(builder: (context) => HomePage()));
-        }
-      });
-    }
   }
 
   Future<void> updateFCMToken(String userId) async {
